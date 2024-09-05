@@ -5,7 +5,7 @@ import { ImageIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { addExpense } from "@/app/lib/actions";
+import { addExpense, uploadImage } from "@/app/lib/actions";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
@@ -24,7 +24,13 @@ export default function ExpenseInput() {
       <CardContent className="p-4">
         <form
           action={async (formData) => {
-            await addExpense(formData);
+            if (image) {
+              const formData = new FormData();
+              formData.append("image", image);
+              await uploadImage(formData);
+            } else {
+              await addExpense(formData);
+            }
             setInput("");
             setImage(null);
           }}

@@ -34,10 +34,23 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
             )}
             {expense.amount}
           </p>
+          {expense.sourceType === "image" &&
+            expense.sourceContent.includes("s3") && (
+              <a
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-sm underline text-gray-800"
+                href={expense.sourceContent}
+              >
+                View receipt
+              </a>
+            )}
           <p className="text-gray-600 text-sm">
             Paid via {expense.paymentMethod}
           </p>
-          <p className="text-gray-600 text-sm">Notes: {expense.notes}</p>
+          {expense.notes && (
+            <p className="text-gray-600 text-sm">Notes: {expense.notes}</p>
+          )}
           <ul className="space-x-1 flex flex-row items-center">
             {expense.tags.map((tag) => {
               return (
