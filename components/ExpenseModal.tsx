@@ -20,7 +20,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
       <Card className="max-w-md w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">{expense.description}</CardTitle>
+          <CardTitle className="text-2xl">{expense.title}</CardTitle>
           <p className="text-gray-600">{expense.category}</p>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -34,17 +34,16 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
             )}
             {expense.amount}
           </p>
-          {expense.sourceType === "image" &&
-            expense.sourceContent.includes("s3") && (
-              <a
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-sm underline text-gray-800"
-                href={expense.sourceContent}
-              >
-                View receipt
-              </a>
-            )}
+          {expense.attachment && (
+            <a
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-sm underline text-gray-800"
+              href={expense.attachment}
+            >
+              View receipt
+            </a>
+          )}
           <p className="text-gray-600 text-sm">
             Paid via {expense.paymentMethod}
           </p>
@@ -61,7 +60,15 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
             })}
           </ul>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col items-center w-full space-y-2">
+          <div className="flex flex-row items-center space-x-2 w-full">
+            <Button className="w-full" variant={"outline"}>
+              Edit
+            </Button>
+            <Button variant={"destructive"} className="w-full">
+              Delete
+            </Button>
+          </div>
           <Button onClick={onClose} className="w-full">
             Close
           </Button>

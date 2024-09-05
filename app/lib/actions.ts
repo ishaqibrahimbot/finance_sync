@@ -1,9 +1,12 @@
 "use server";
 
-import { Expense } from "./types";
+import { revalidatePath } from "next/cache";
+import { Expense, ExpensePostBody, ExpensePostSchema } from "./types";
 
 export async function getExpenses() {
-  const result = await fetch(`${process.env.API_GATEWAY_ROOT_URL}/expenses`);
+  const result = await fetch(
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA`
+  );
   const expenses: Expense[] = await result.json();
   expenses.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
@@ -13,45 +16,32 @@ export async function getExpenses() {
 }
 
 export async function addExpense(formData: FormData) {
-  const rawText = formData.get("rawExpenseText");
+  const rawText = formData.get("rawExpenseText") as string;
+  const image = formData.get("image") as File;
 
-  console.log("adding", rawText);
+  console.log("got from form: ", rawText, image);
 
-  const payload = {
-    event: {
-      type: "message",
-      text: rawText,
-      user: "U07KDCUA8DA",
-    },
+  if (!rawText && !image) return;
+
+  const payload: ExpensePostBody = {
+    userId: "U07KDCUA8DA",
+    text: rawText,
   };
 
-  await fetch(`${process.env.API_GATEWAY_ROOT_URL}/webhook`, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
+  if (image) {
+    const arrayBuffer = await image.arrayBuffer();
+    const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
-export async function uploadImage(formData: FormData) {
-  const image = formData.get("image") as File;
-  console.log("image", image);
-
-  const arrayBuffer = await image.arrayBuffer();
-  const base64Data = Buffer.from(arrayBuffer).toString("base64");
-
-  const payload = {
-    event: {
-      type: "image_upload",
+    payload.image = {
       filename: image.name,
       contentType: image.type,
       base64Data,
-      user: "U07KDCUA8DA",
-    },
-  };
+    };
+  }
 
-  const result = await fetch(`${process.env.API_GATEWAY_ROOT_URL}/webhook`, {
+  //   console.log("payload", payload);
+
+  const result = await fetch(`${process.env.API_GATEWAY_ROOT_URL}/expenses`, {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
@@ -59,7 +49,12 @@ export async function uploadImage(formData: FormData) {
     },
   });
 
-  console.log("result.ok", result.ok);
+  if (!result.ok) {
+    console.log("oops something went wrong");
+    return;
+  }
 
-  return;
+  const newlyAddedExpense = await result.json();
+  revalidatePath("/");
+  return newlyAddedExpense as Expense;
 }

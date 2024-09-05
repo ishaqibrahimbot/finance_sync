@@ -5,12 +5,13 @@ import { ImageIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { addExpense, uploadImage } from "@/app/lib/actions";
+import { addExpense } from "@/app/lib/actions";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,15 +25,14 @@ export default function ExpenseInput() {
       <CardContent className="p-4">
         <form
           action={async (formData) => {
+            setLoading(true);
             if (image) {
-              const formData = new FormData();
               formData.append("image", image);
-              await uploadImage(formData);
-            } else {
-              await addExpense(formData);
             }
+            await addExpense(formData);
             setInput("");
             setImage(null);
+            setLoading(false);
           }}
           className="space-y-4"
         >
