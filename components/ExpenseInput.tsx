@@ -23,19 +23,7 @@ export default function ExpenseInput() {
   return (
     <Card className="fixed bg-slate-300 bottom-0 left-0 right-0 border-t rounded-t-xl">
       <CardContent className="p-4">
-        <form
-          action={async (formData) => {
-            setLoading(true);
-            if (image) {
-              formData.append("image", image);
-            }
-            await addExpense(formData);
-            setInput("");
-            setImage(null);
-            setLoading(false);
-          }}
-          className="space-y-4"
-        >
+        <div className="space-y-4">
           <Textarea
             value={input}
             name="rawExpenseText"
@@ -62,7 +50,19 @@ export default function ExpenseInput() {
               className="hidden"
             />
             <Button
-              type="submit"
+              loading={loading}
+              onClick={async () => {
+                setLoading(true);
+                const formData = new FormData();
+                formData.append("rawExpenseText", input);
+                if (image) {
+                  formData.append("image", image);
+                }
+                await addExpense(formData);
+                setInput("");
+                setImage(null);
+                setLoading(false);
+              }}
               size="sm"
               className="h-10 px-6 rounded-lg"
               disabled={!input.trim() && !image}
@@ -76,7 +76,7 @@ export default function ExpenseInput() {
               Image attached: {image.name}
             </div>
           )}
-        </form>
+        </div>
       </CardContent>
     </Card>
   );

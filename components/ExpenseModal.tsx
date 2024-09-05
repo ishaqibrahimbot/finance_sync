@@ -9,6 +9,10 @@ import {
 } from "@/components/ui/card";
 import { CalendarIcon, DollarSignIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { deleteExpense, updateExpense } from "@/app/lib/actions";
+import { useState } from "react";
+import { Textarea } from "./ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface ExpenseModalProps {
   expense: Expense;
@@ -16,6 +20,10 @@ interface ExpenseModalProps {
 }
 
 export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
+  const [editing, setEditing] = useState(false);
+  const [editPrompt, setEditPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
       <Card className="max-w-md w-full">
@@ -60,16 +68,66 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
             })}
           </ul>
         </CardContent>
-        <CardFooter className="flex flex-col items-center w-full space-y-2">
-          <div className="flex flex-row items-center space-x-2 w-full">
-            <Button className="w-full" variant={"outline"}>
-              Edit
+        <CardFooter className="flex flex-col items-center w-full space-y-4">
+          <div className="flex flex-row items-center space-x-4 w-full">
+            <Button
+              onClick={() => {
+                if (editing) {
+                  setEditing(false);
+                } else {
+                  setEditing(true);
+                }
+              }}
+              className="w-full"
+              disabled={loading}
+              variant={"outline"}
+            >
+              {editing ? `Cancel Edit` : `Edit`}
             </Button>
-            <Button variant={"destructive"} className="w-full">
+            <Button
+              loading={loading}
+              disabled={editing}
+              onClick={async () => {
+                setLoading(true);
+                await deleteExpense(expense.expenseId);
+                setLoading(false);
+                onClose();
+              }}
+              variant={"destructive"}
+              className="w-full"
+            >
               Delete
             </Button>
           </div>
-          <Button onClick={onClose} className="w-full">
+          {editing && (
+            <>
+              <Textarea
+                value={editPrompt}
+                onChange={(e) => setEditPrompt(e.target.value)}
+                placeholder="Describe your changes..."
+                className="w-full min-h-[80px] resize-none rounded-md"
+              />
+              <Button
+                loading={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  await updateExpense(expense.expenseId, editPrompt);
+                  setEditing(false);
+                  setEditPrompt("");
+                  setLoading(false);
+                  onClose();
+                }}
+                variant={"default"}
+                className="w-full"
+              >
+                Save
+              </Button>
+            </>
+          )}
+          <Button
+            onClick={onClose}
+            className={cn("w-full", editing && "hidden")}
+          >
             Close
           </Button>
         </CardFooter>

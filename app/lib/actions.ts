@@ -9,7 +9,7 @@ export async function getExpenses() {
   );
   const expenses: Expense[] = await result.json();
   expenses.sort((a, b) => {
-    if (a.createdAt > b.createdAt) return -1;
+    if (a.date > b.date) return -1;
     else return 1;
   });
   return expenses;
@@ -57,4 +57,37 @@ export async function addExpense(formData: FormData) {
   const newlyAddedExpense = await result.json();
   revalidatePath("/");
   return newlyAddedExpense as Expense;
+}
+
+export async function updateExpense(expenseId: string, prompt: string) {
+  const result = await fetch(
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA/${expenseId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        prompt,
+      }),
+    }
+  );
+
+  if (result.ok) {
+    revalidatePath("/");
+  }
+
+  return;
+}
+
+export async function deleteExpense(expenseId: string) {
+  const result = await fetch(
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA/${expenseId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (result.ok) {
+    revalidatePath("/");
+  }
+
+  return;
 }
