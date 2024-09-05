@@ -5,17 +5,11 @@ import ExpenseItem from "./ExpenseItem";
 import ExpenseModal from "./ExpenseModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface Expense {
-  id: number;
-  title: string;
-  date: string;
-  amount: number;
-}
+import { Expense } from "@/app/lib/types";
 
 interface ExpenseListProps {
   expenses: Expense[];
-  pendingExpense: string | null;
+  pendingExpense?: string | null;
 }
 
 export default function ExpenseList({
@@ -43,7 +37,7 @@ export default function ExpenseList({
         )}
         {expenses.map((expense) => (
           <ExpenseItem
-            key={expense.id}
+            key={expense.expenseId}
             expense={expense}
             onClick={() => setSelectedExpense(expense)}
           />

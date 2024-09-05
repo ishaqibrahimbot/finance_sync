@@ -104,7 +104,7 @@ export default function RootLayout({
 <link rel='apple-touch-startup-image' href='/images/apple_splash_640.png' sizes='640x1136' />
 --> */}
       </head>
-      <body className={cn(inter.className)}>{children}</body>
+      <body className={cn(inter.className, "bg-slate-100")}>{children}</body>
     </html>
   );
 }
