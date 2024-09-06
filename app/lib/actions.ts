@@ -39,6 +39,7 @@ export async function addExpense(formData: FormData) {
           fit: "inside",
           width: 2048,
         })
+        .withMetadata()
         .toBuffer({
           resolveWithObject: true,
         });
