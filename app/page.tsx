@@ -2,6 +2,8 @@ import ExpenseInput from "@/components/ExpenseInput";
 import ExpenseList from "@/components/ExpenseList";
 import { getExpenses } from "./lib/actions";
 
+export const maxDuration = 60;
+
 export default async function Home() {
   const expenses = await getExpenses();
 
