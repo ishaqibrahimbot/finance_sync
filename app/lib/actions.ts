@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 import { Expense, ExpensePostBody } from "./types";
 import sharp from "sharp";
 
-export async function getExpenses() {
+export async function getExpenses(userId: string) {
   const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA`
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}`
   );
   const expenses: Expense[] = await result.json();
   expenses.sort((a, b) => {
@@ -16,7 +16,13 @@ export async function getExpenses() {
   return expenses;
 }
 
-export async function addExpense(formData: FormData) {
+export async function addExpense({
+  formData,
+  userId,
+}: {
+  formData: FormData;
+  userId: string;
+}) {
   const rawText = formData.get("rawExpenseText") as string;
   const image = formData.get("image") as File;
 
@@ -25,7 +31,7 @@ export async function addExpense(formData: FormData) {
   if (!rawText && !image) return;
 
   const payload: ExpensePostBody = {
-    userId: "U07KDCUA8DA",
+    userId,
     text: rawText,
   };
 
@@ -82,9 +88,17 @@ export async function addExpense(formData: FormData) {
   return newlyAddedExpense as Expense;
 }
 
-export async function updateExpense(expenseId: string, prompt: string) {
+export async function updateExpense({
+  expenseId,
+  prompt,
+  userId,
+}: {
+  expenseId: string;
+  prompt: string;
+  userId: string;
+}) {
   const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA/${expenseId}`,
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}/${expenseId}`,
     {
       method: "PUT",
       body: JSON.stringify({
@@ -100,9 +114,15 @@ export async function updateExpense(expenseId: string, prompt: string) {
   return;
 }
 
-export async function deleteExpense(expenseId: string) {
+export async function deleteExpense({
+  expenseId,
+  userId,
+}: {
+  expenseId: string;
+  userId: string;
+}) {
   const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/U07KDCUA8DA/${expenseId}`,
+    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}/${expenseId}`,
     {
       method: "DELETE",
     }

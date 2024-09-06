@@ -13,6 +13,7 @@ import { deleteExpense, updateExpense } from "@/app/lib/actions";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@clerk/nextjs";
 
 interface ExpenseModalProps {
   expense: Expense;
@@ -23,6 +24,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
   const [editing, setEditing] = useState(false);
   const [editPrompt, setEditPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const { userId } = useAuth();
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
@@ -89,7 +91,10 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
               disabled={editing}
               onClick={async () => {
                 setLoading(true);
-                await deleteExpense(expense.expenseId);
+                await deleteExpense({
+                  expenseId: expense.expenseId,
+                  userId: userId!,
+                });
                 setLoading(false);
                 onClose();
               }}
@@ -111,7 +116,11 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 loading={loading}
                 onClick={async () => {
                   setLoading(true);
-                  await updateExpense(expense.expenseId, editPrompt);
+                  await updateExpense({
+                    expenseId: expense.expenseId,
+                    prompt: editPrompt,
+                    userId: userId!,
+                  });
                   setEditing(false);
                   setEditPrompt("");
                   setLoading(false);

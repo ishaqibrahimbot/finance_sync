@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { addExpense } from "@/app/lib/actions";
+import { useAuth } from "@clerk/nextjs";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const { userId } = useAuth();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,7 +30,7 @@ export default function ExpenseInput() {
             value={input}
             name="rawExpenseText"
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe your expense..."
+            placeholder="Spent a fortune on chocolate bars..."
             className="w-full min-h-[100px] resize-none rounded-xl"
           />
           <div className="flex justify-between items-center">
@@ -58,7 +60,8 @@ export default function ExpenseInput() {
                 if (image) {
                   formData.append("image", image);
                 }
-                await addExpense(formData);
+                // used in a protected route, userId must be defined
+                await addExpense({ formData, userId: userId! });
                 setInput("");
                 setImage(null);
                 setLoading(false);

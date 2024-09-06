@@ -15,8 +15,8 @@ export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
     >
       <CardContent className="p-4 flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold">{expense.title}</h3>
-          <p className="text-sm text-muted-foreground flex items-center">
+          <h3 className="text-base font-semibold">{expense.title}</h3>
+          <p className="text-sm mt-1 text-muted-foreground flex items-center">
             <CalendarIcon className="h-4 w-4 mr-1" />
             {expense.date}
           </p>
