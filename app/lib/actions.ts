@@ -13,10 +13,6 @@ export async function getExpenses(userId: string) {
     if (a.date > b.date) return -1;
     else return 1;
   });
-  console.log(
-    "categories: ",
-    expenses.map((expense) => expense.category)
-  );
   return expenses;
 }
 
