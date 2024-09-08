@@ -91,14 +91,19 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
               disabled={editing}
               onClick={async () => {
                 setLoading(true);
-                await safeExecuteAction("deleteExpense", async () => {
-                  await deleteExpense({
-                    expenseId: expense.expenseId,
-                    userId: userId!,
-                  });
+                await safeExecuteAction({
+                  id: "deleteExpense",
+                  action: async () => {
+                    await deleteExpense({
+                      expenseId: expense.expenseId,
+                      userId: userId!,
+                    });
+                  },
+                  onSuccess: () => {
+                    onClose();
+                  },
                 });
                 setLoading(false);
-                onClose();
               }}
               variant={"destructive"}
               className="w-full"
@@ -118,17 +123,22 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 loading={loading}
                 onClick={async () => {
                   setLoading(true);
-                  await safeExecuteAction("updateExpense", async () => {
-                    await updateExpense({
-                      expenseId: expense.expenseId,
-                      prompt: editPrompt,
-                      userId: userId!,
-                    });
+                  await safeExecuteAction({
+                    id: "updateExpense",
+                    action: async () => {
+                      await updateExpense({
+                        expenseId: expense.expenseId,
+                        prompt: editPrompt,
+                        userId: userId!,
+                      });
+                    },
+                    onSuccess: () => {
+                      setEditing(false);
+                      setEditPrompt("");
+                      onClose();
+                    },
                   });
-                  setEditing(false);
-                  setEditPrompt("");
                   setLoading(false);
-                  onClose();
                 }}
                 variant={"default"}
                 className="w-full"

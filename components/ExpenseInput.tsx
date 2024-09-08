@@ -75,12 +75,16 @@ export default function ExpenseInput() {
                   formData.append("image", image);
                 }
                 // used in a protected route, userId must be defined
-                await safeExecuteAction("addExpense", async () => {
-                  await addExpense({ formData, userId: userId! });
+                await safeExecuteAction({
+                  id: "addExpense",
+                  action: async () => {
+                    await addExpense({ formData, userId: userId! });
+                  },
+                  onSuccess: () => {
+                    setInput("");
+                    setImage(null);
+                  },
                 });
-
-                setInput("");
-                setImage(null);
                 setLoading(false);
               }}
               size="sm"
