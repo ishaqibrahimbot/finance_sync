@@ -26,8 +26,6 @@ export async function addExpense({
   const rawText = formData.get("rawExpenseText") as string;
   const image = formData.get("image") as File;
 
-  throw new Error("oops something went wrong");
-
   console.log("got from form: ", rawText, image);
 
   if (!rawText && !image) return;
