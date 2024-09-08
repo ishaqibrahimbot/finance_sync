@@ -12,7 +12,7 @@ import { Badge } from "./ui/badge";
 import { deleteExpense, updateExpense } from "@/app/lib/actions";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn, safeExecuteAction } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 
 interface ExpenseModalProps {
@@ -91,9 +91,11 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
               disabled={editing}
               onClick={async () => {
                 setLoading(true);
-                await deleteExpense({
-                  expenseId: expense.expenseId,
-                  userId: userId!,
+                await safeExecuteAction("deleteExpense", async () => {
+                  await deleteExpense({
+                    expenseId: expense.expenseId,
+                    userId: userId!,
+                  });
                 });
                 setLoading(false);
                 onClose();
@@ -116,10 +118,12 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 loading={loading}
                 onClick={async () => {
                   setLoading(true);
-                  await updateExpense({
-                    expenseId: expense.expenseId,
-                    prompt: editPrompt,
-                    userId: userId!,
+                  await safeExecuteAction("updateExpense", async () => {
+                    await updateExpense({
+                      expenseId: expense.expenseId,
+                      prompt: editPrompt,
+                      userId: userId!,
+                    });
                   });
                   setEditing(false);
                   setEditPrompt("");

@@ -20,8 +20,15 @@
     }
   ],
   "theme_color": "#FFFFFF",
-  "background_color": "#FFFFFF",
+  "background_color": "#F1F5F9",
   "start_url": "/",
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "text": "prompt"
+    }
+  },
   "display": "standalone",
   "orientation": "portrait"
 }

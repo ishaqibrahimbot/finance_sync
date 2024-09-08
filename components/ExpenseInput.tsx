@@ -7,13 +7,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { addExpense } from "@/app/lib/actions";
 import { useAuth } from "@clerk/nextjs";
+import { safeExecuteAction } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
   const { userId } = useAuth();
+  const queryParams = useSearchParams();
+  const router = useRouter();
+
+  if (queryParams.has("prompt") && queryParams.get("prompt") !== input) {
+    const prompt = queryParams.get("prompt");
+    console.log("got this prompt", prompt);
+    setInput(prompt!);
+    inputRef?.current?.focus();
+    router.push("/");
+  }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,6 +41,7 @@ export default function ExpenseInput() {
         <div className="space-y-4">
           <Textarea
             value={input}
+            ref={inputRef}
             name="rawExpenseText"
             onChange={(e) => setInput(e.target.value)}
             placeholder="Spent a fortune on chocolate bars..."
@@ -61,7 +75,10 @@ export default function ExpenseInput() {
                   formData.append("image", image);
                 }
                 // used in a protected route, userId must be defined
-                await addExpense({ formData, userId: userId! });
+                await safeExecuteAction("addExpense", async () => {
+                  await addExpense({ formData, userId: userId! });
+                });
+
                 setInput("");
                 setImage(null);
                 setLoading(false);
