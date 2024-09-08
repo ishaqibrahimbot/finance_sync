@@ -2,7 +2,7 @@
 const nextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "6mb", // might be excessive, but let's go with it for now
+      bodySizeLimit: "10mb", // might be excessive, but let's go with it for now
     },
   },
 };
