@@ -9,6 +9,9 @@ import { addExpense } from "@/app/lib/actions";
 import { useAuth } from "@clerk/nextjs";
 import { safeExecuteAction } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+
+const VERCEL_FUNCTIONS_MAX_PAYLOAD_SIZE = 4500000;
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
@@ -31,6 +34,20 @@ export default function ExpenseInput() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > VERCEL_FUNCTIONS_MAX_PAYLOAD_SIZE) {
+        toast.error(
+          "Sorry, that image is too big for us to handle (for now). Upload an image that is < 4.5Mb."
+        );
+        setTimeout(() => {
+          toast.info(
+            "Compression hack: send the image to yourself on whatsapp and download/use that image ;)"
+          );
+        }, 4000);
+        if (fileInputRef?.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
       setImage(file);
     }
   };
