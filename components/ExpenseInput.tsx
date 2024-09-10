@@ -31,6 +31,16 @@ export default function ExpenseInput() {
     router.push("/");
   }
 
+  if (queryParams.has("message")) {
+    const message = queryParams.get("message");
+    toast.error(
+      message === "image-not-found"
+        ? "We could not find the shared image. Please try again"
+        : message
+    );
+    router.push("/");
+  }
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

@@ -16,13 +16,28 @@
   "theme_color": "#FFFFFF",
   "background_color": "#F1F5F9",
   "start_url": "/",
-  "share_target": {
-    "action": "/",
-    "method": "GET",
-    "params": {
-      "text": "prompt"
+  "share_target": [
+    {
+      "action": "/",
+      "method": "GET",
+      "params": {
+        "text": "prompt"
+      }
+    },
+    {
+      "action": "/api/share-image",
+      "method": "POST",
+      "enctype": "multipart/form-data",
+      "params": {
+        "files": [
+          {
+            "name": "image",
+            "accept": ["image/*"]
+          }
+        ]
+      }
     }
-  },
+  ],
   "display": "standalone",
   "orientation": "portrait"
 }
