@@ -6,9 +6,14 @@ import { writeFile } from "fs/promises";
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const image = formData.get("image") as File;
+  const prompt = formData.get("prompt") as string;
 
-  if (!image) {
-    return NextResponse.json({ error: "no image provided" }, { status: 400 });
+  if (!prompt || !image) {
+    return NextResponse.json({ error: "no data provided" }, { status: 400 });
+  }
+
+  if (prompt) {
+    return NextResponse.redirect(new URL(`/?prompt=${prompt}`, request.url));
   }
 
   const buffer = await image.arrayBuffer();
