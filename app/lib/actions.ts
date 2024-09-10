@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { Expense, ExpensePostBody } from "./types";
-import sharp from "sharp";
 
 export async function getExpenses(userId: string) {
   const result = await fetch(
@@ -37,28 +36,6 @@ export async function addExpense({
 
   if (image) {
     let arrayBuffer: ArrayBuffer = await image.arrayBuffer();
-    const oneMegaByte = 1000000;
-
-    if (image.size > oneMegaByte) {
-      const resizedImage = await sharp(arrayBuffer)
-        .resize({
-          fit: "inside",
-          width: 2048,
-        })
-        .withMetadata()
-        .toBuffer({
-          resolveWithObject: true,
-        });
-
-      console.log(
-        `Image resized from ${image.size / 1000} kB to ${
-          resizedImage.info.size / 1000
-        } kB`
-      );
-
-      arrayBuffer = resizedImage.data;
-    }
-
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
     payload.image = {

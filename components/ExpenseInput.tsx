@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ImageIcon, SendIcon } from "lucide-react";
+import { ImageIcon, SendIcon, CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,13 +10,13 @@ import { useAuth } from "@clerk/nextjs";
 import { safeExecuteAction } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-
-const VERCEL_FUNCTIONS_MAX_PAYLOAD_SIZE = 4500000;
+import Compressor from "compressorjs";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
   const [image, setImage] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageUploadInputRef = useRef<HTMLInputElement>(null);
+  const imageCaptureInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
   const { userId } = useAuth();
@@ -34,21 +34,41 @@ export default function ExpenseInput() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > VERCEL_FUNCTIONS_MAX_PAYLOAD_SIZE) {
-        toast.error(
-          "Sorry, that image is too big for us to handle (for now). Upload an image that is < 4.5Mb."
-        );
-        setTimeout(() => {
-          toast.info(
-            "Compression hack: send the image to yourself on whatsapp and download/use that image ;)"
-          );
-        }, 4000);
-        if (fileInputRef?.current) {
-          fileInputRef.current.value = "";
-        }
-        return;
-      }
-      setImage(file);
+      console.log("original file size", file.size);
+      console.log("original file type", file.type);
+
+      const promise = new Promise<File>(
+        (resolve, reject) =>
+          new Compressor(file, {
+            quality: 0.8,
+            retainExif: true,
+            width: 2048,
+            success: (file) => {
+              resolve(file as File);
+            },
+            error: reject,
+          })
+      );
+
+      toast.promise(promise, {
+        loading: "Compressing your image...",
+        success(data: File) {
+          console.log("new file size", data.size);
+          console.log("new file type", data.type);
+          console.log("file", data.name);
+          setImage(data);
+
+          return "Done! Your image is ready to be sent.";
+        },
+        error(data) {
+          if (imageUploadInputRef?.current)
+            imageUploadInputRef.current.value = "";
+          if (imageCaptureInputRef?.current)
+            imageCaptureInputRef.current.value = "";
+          console.error(data);
+          return "Something went wrong while compressing your image. Please try again";
+        },
+      });
     }
   };
 
@@ -65,21 +85,43 @@ export default function ExpenseInput() {
             className="w-full min-h-[100px] resize-none rounded-xl"
           />
           <div className="flex justify-between items-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              className="h-10 px-4 rounded-lg border-2 border-gray-300"
-            >
-              <ImageIcon className="h-5 w-5 mr-2" />
-              Upload Image
-            </Button>
+            <div className="flex items-center justify-start space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => imageUploadInputRef.current?.click()}
+                className="h-10 px-4 rounded-lg border-2 border-gray-300"
+              >
+                <ImageIcon className="h-5 w-5 mr-2" />
+                Upload
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => imageCaptureInputRef.current?.click()}
+                className="h-10 px-4 rounded-lg border-2 border-gray-300"
+              >
+                <CameraIcon className="h-5 w-5 mr-2" />
+                Capture
+              </Button>
+            </div>
             <input
               type="file"
-              ref={fileInputRef}
+              ref={imageUploadInputRef}
+              id="image-upload"
               onChange={handleImageUpload}
               accept="image/*"
+              className="hidden"
+            />
+            <input
+              type="file"
+              ref={imageCaptureInputRef}
+              id="image-capture"
+              onChange={handleImageUpload}
+              accept="image/*"
+              capture="environment"
               className="hidden"
             />
             <Button
