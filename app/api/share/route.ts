@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "no data provided" }, { status: 400 });
   }
 
+  console.log("request.nextUrl.host", request.nextUrl.host);
   const redirectUrl = new URL(request.nextUrl.host);
 
   if (prompt) {
