@@ -8,11 +8,14 @@ export async function POST(request: NextRequest) {
   const image = formData.get("image") as File;
   const prompt = formData.get("prompt") as string;
 
+  console.log("received: ", prompt, image?.name);
+
   if (!prompt || !image) {
     return NextResponse.json({ error: "no data provided" }, { status: 400 });
   }
 
   if (prompt) {
+    console.log("redirecting to homepage", request.url);
     return NextResponse.redirect(new URL(`/?prompt=${prompt}`, request.url));
   }
 
