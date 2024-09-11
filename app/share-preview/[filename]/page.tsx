@@ -19,7 +19,7 @@ export default async function SharePreview({
     redirect("/");
   }
 
-  const filepath = path.join(process.cwd(), "public", "uploads", filename);
+  const filepath = path.join("/tmp", filename);
 
   try {
     await fs.access(filepath);
@@ -61,7 +61,7 @@ export default async function SharePreview({
       <h1 className="text-2xl font-bold mb-4">Shared Image Preview</h1>
       <div className="mb-4">
         <Image
-          src={`/uploads/${filename}`}
+          src={`/tmp/${filename}`}
           alt="Shared image"
           width={400}
           height={400}

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   const buffer = await image.arrayBuffer();
   const filename = `${uuidv4()}${path.extname(image.name)}`;
-  const filepath = path.join(process.cwd(), "public", "uploads", filename);
+  const filepath = path.join("/tmp", filename);
 
   await writeFile(filepath, Buffer.from(buffer));
 
