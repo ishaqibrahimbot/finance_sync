@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "no data provided" }, { status: 400 });
   }
 
-  console.log("request.nextUrl.origin", request.nextUrl.origin);
-  const redirectUrl = new URL(request.nextUrl.origin);
+  const redirectUrl = request.nextUrl.clone();
 
   if (prompt) {
+    redirectUrl.pathname = "/";
     redirectUrl.searchParams.append("prompt", prompt);
     console.log("redirecting to: ", redirectUrl.href);
-    return NextResponse.redirect(`/?prompt=${prompt}`);
+    return NextResponse.redirect(redirectUrl);
   }
 
   const buffer = await image.arrayBuffer();
