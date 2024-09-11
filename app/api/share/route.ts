@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
   console.log("received: ", prompt, image?.name);
 
-  if (!prompt || !image) {
+  if (!prompt && !image) {
     return NextResponse.json({ error: "no data provided" }, { status: 400 });
   }
 
