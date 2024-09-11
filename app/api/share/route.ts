@@ -32,5 +32,5 @@ export async function POST(request: NextRequest) {
 
   redirectUrl.pathname = `/share-preview/${filename}`;
   console.log("redirecting to: ", redirectUrl.href);
-  return NextResponse.redirect(redirectUrl.href);
+  redirect(redirectUrl.href);
 }
