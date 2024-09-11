@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   if (prompt) {
     redirectUrl.searchParams.append("prompt", prompt);
     console.log("redirecting to: ", redirectUrl.href);
-    return NextResponse.redirect(redirectUrl.href);
+    return NextResponse.redirect(`/?prompt=${prompt}`);
   }
 
   const buffer = await image.arrayBuffer();
