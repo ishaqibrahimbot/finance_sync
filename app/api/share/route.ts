@@ -14,9 +14,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "no data provided" }, { status: 400 });
   }
 
+  const redirectUrl = new URL(request.nextUrl.host);
+
   if (prompt) {
-    console.log("redirecting to homepage", request.url);
-    return NextResponse.redirect(new URL(`/?prompt=${prompt}`, request.url));
+    redirectUrl.searchParams.append("prompt", prompt);
+    console.log("redirecting to: ", redirectUrl.href);
+    return NextResponse.redirect(redirectUrl.href);
   }
 
   const buffer = await image.arrayBuffer();
@@ -25,6 +28,7 @@ export async function POST(request: NextRequest) {
 
   await writeFile(filepath, Buffer.from(buffer));
 
-  const redirectUrl = `/share-preview/${filename}`;
-  return NextResponse.redirect(new URL(redirectUrl, request.url));
+  redirectUrl.pathname = `/share-preview/${filename}`;
+  console.log("redirecting to: ", redirectUrl.href);
+  return NextResponse.redirect(redirectUrl.href);
 }
