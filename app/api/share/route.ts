@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { redirect } from "next/navigation";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     redirectUrl.pathname = "/";
     redirectUrl.searchParams.append("prompt", prompt);
     console.log("redirecting to: ", redirectUrl.href);
-    return NextResponse.redirect(redirectUrl);
+    redirect(redirectUrl.href);
   }
 
   const buffer = await image.arrayBuffer();
