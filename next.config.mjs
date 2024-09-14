@@ -11,6 +11,7 @@ import nextPWA from "next-pwa";
 
 const withPWA = nextPWA({
   dest: "public",
+  customWorkerDir: "worker",
 });
 
 export default withPWA(nextConfig);
