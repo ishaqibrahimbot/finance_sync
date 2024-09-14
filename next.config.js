@@ -38,15 +38,7 @@ const nextConfig = {
 const isDev = process.env.NODE_ENV !== "production";
 
 const withPWA = nextPWA({
-  runtimeCaching: [
-    {
-      urlPattern: "/",
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "homepage",
-      },
-    },
-  ],
+  cacheStartUrl: false,
   buildExcludes: [
     ({ asset, compilation }) => {
       if (
