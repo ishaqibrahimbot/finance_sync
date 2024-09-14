@@ -38,6 +38,15 @@ const nextConfig = {
 const isDev = process.env.NODE_ENV !== "production";
 
 const withPWA = nextPWA({
+  runtimeCaching: [
+    {
+      urlPattern: "/",
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "homepage",
+      },
+    },
+  ],
   buildExcludes: [
     ({ asset, compilation }) => {
       if (
@@ -53,10 +62,8 @@ const withPWA = nextPWA({
       }
       return false;
     },
-    "/_next/static/chunks/app/layout.*",
   ],
   dest: "public",
-  customWorkerDir: "worker",
 });
 
 module.exports = withPWA(nextConfig);
