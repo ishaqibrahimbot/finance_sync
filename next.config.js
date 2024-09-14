@@ -38,7 +38,6 @@ const nextConfig = {
 const isDev = process.env.NODE_ENV !== "production";
 
 const withPWA = nextPWA({
-  scope: "/api/share",
   buildExcludes: [
     ({ asset, compilation }) => {
       if (
@@ -50,6 +49,9 @@ const withPWA = nextPWA({
         return true;
       }
       if (isDev && !asset.name.startsWith("static/runtime/")) {
+        return true;
+      }
+      if (asset.name.startsWith("static/chunks")) {
         return true;
       }
       return false;
