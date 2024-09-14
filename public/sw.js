@@ -8,13 +8,13 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", async (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname === "/api/share" && event.request.method === "POST") {
+  if (url.pathname === "/" && event.request.method === "POST") {
     event.respondWith(handleRequest(event.request));
   }
 });
 
 async function handleRequest(request) {
-  console.log("HANDLING POST FROM '/api/share'");
+  console.log("HANDLING POST FROM '/'");
 
   const clonedRequest = request.clone();
   const formData = await clonedRequest.formData();
