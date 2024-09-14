@@ -38,8 +38,19 @@ const nextConfig = {
 const isDev = process.env.NODE_ENV !== "production";
 
 const withPWA = nextPWA({
+  navigationPreload: true,
+  runtimeCaching: [
+    {
+      urlPattern: "/",
+      method: "GET",
+      handler: ({ event, request }) => {
+        event.respondWith(fetch(request));
+      },
+    },
+  ],
   buildExcludes: [
     ({ asset, compilation }) => {
+      console.log(asset.name);
       if (
         asset.name.startsWith("server/") ||
         asset.name.match(
@@ -49,9 +60,6 @@ const withPWA = nextPWA({
         return true;
       }
       if (isDev && !asset.name.startsWith("static/runtime/")) {
-        return true;
-      }
-      if (asset.name.startsWith("static/chunks")) {
         return true;
       }
       return false;

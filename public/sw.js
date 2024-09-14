@@ -67,9 +67,10 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-8817a5e5'], (function (workbox) { 'use strict';
+define(['./workbox-9c126171'], (function (workbox) { 'use strict';
 
   importScripts("worker-development.js");
+  workbox.enable();
   self.skipWaiting();
   workbox.clientsClaim();
   workbox.registerRoute("/", new workbox.NetworkFirst({
