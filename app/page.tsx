@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 export const maxDuration = 60;
 
@@ -49,9 +50,12 @@ export default async function Home() {
   const expenses = await getExpenses(userId);
 
   return (
-    <div className="container mx-auto p-4 pb-32">
-      <ExpenseList expenses={expenses} />
-      <ExpenseInput />
-    </div>
+    <>
+      <ServiceWorkerRegistration />
+      <div className="container mx-auto p-4 pb-32">
+        <ExpenseList expenses={expenses} />
+        <ExpenseInput />
+      </div>
+    </>
   );
 }

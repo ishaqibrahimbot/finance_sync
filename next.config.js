@@ -1,32 +1,42 @@
-const nextPWA = require("next-pwa");
-const path = require("path");
-
-// https://github.com/shadowwalker/next-pwa/issues/424#issuecomment-1332258575
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack(config) {
-    const registerJs = path.join(
-      path.dirname(require.resolve("next-pwa")),
-      "register.js"
-    );
-    const entry = config.entry;
-
-    config.entry = () =>
-      entry().then((entries) => {
-        // Automatically registers the SW and enables certain `next-pwa` features in
-        // App Router (https://github.com/shadowwalker/next-pwa/pull/427)
-        if (entries["main-app"] && !entries["main-app"].includes(registerJs)) {
-          if (Array.isArray(entries["main-app"])) {
-            entries["main-app"].unshift(registerJs);
-          } else if (typeof entries["main-app"] === "string") {
-            entries["main-app"] = [registerJs, entries["main-app"]];
-          }
-        }
-        return entries;
-      });
-
-    return config;
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+        ],
+      },
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self'",
+          },
+        ],
+      },
+    ];
   },
   experimental: {
     serverActions: {
@@ -35,37 +45,4 @@ const nextConfig = {
   },
 };
 
-const isDev = process.env.NODE_ENV !== "production";
-
-const withPWA = nextPWA({
-  navigationPreload: true,
-  runtimeCaching: [
-    {
-      urlPattern: "/",
-      method: "GET",
-      handler: ({ event, request }) => {
-        event.respondWith(fetch(request));
-      },
-    },
-  ],
-  buildExcludes: [
-    ({ asset, compilation }) => {
-      console.log(asset.name);
-      if (
-        asset.name.startsWith("server/") ||
-        asset.name.match(
-          /^((app-|^)build-manifest\.json|react-loadable-manifest\.json)$/
-        )
-      ) {
-        return true;
-      }
-      if (isDev && !asset.name.startsWith("static/runtime/")) {
-        return true;
-      }
-      return false;
-    },
-  ],
-  dest: "public",
-});
-
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;

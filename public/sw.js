@@ -1,102 +1,41 @@
-/**
- * Copyright 2018 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+self.addEventListener("install", (event) => {
+  console.log("Service worker installed");
+});
+self.addEventListener("activate", (event) => {
+  console.log("Service worker activated");
+});
 
-// If the loader is already loaded, just stop.
-if (!self.define) {
-  let registry = {};
+self.addEventListener("fetch", async (event) => {
+  const url = new URL(event.request.url);
 
-  // Used for `eval` and `importScripts` where we can't get script URL by other means.
-  // In both cases, it's safe to use a global var because those functions are synchronous.
-  let nextDefineUri;
+  if (url.pathname === "/api/share" && event.request.method === "POST") {
+    event.respondWith(handleRequest(event.request));
+  }
+});
 
-  const singleRequire = (uri, parentUri) => {
-    uri = new URL(uri + ".js", parentUri).href;
-    return registry[uri] || (
-      
-        new Promise(resolve => {
-          if ("document" in self) {
-            const script = document.createElement("script");
-            script.src = uri;
-            script.onload = resolve;
-            document.head.appendChild(script);
-          } else {
-            nextDefineUri = uri;
-            importScripts(uri);
-            resolve();
-          }
-        })
-      
-      .then(() => {
-        let promise = registry[uri];
-        if (!promise) {
-          throw new Error(`Module ${uri} didn’t register its module`);
-        }
-        return promise;
-      })
-    );
-  };
+async function handleRequest(request) {
+  console.log("HANDLING POST FROM '/api/share'");
 
-  self.define = (depsNames, factory) => {
-    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
-    if (registry[uri]) {
-      // Module is already loading or loaded.
-      return;
+  const clonedRequest = request.clone();
+  const formData = await clonedRequest.formData();
+  const prompt = formData.get("prompt");
+  const image = formData.get("image");
+  console.log("PROMPT: ", prompt);
+
+  if (prompt) {
+    return Response.redirect(`/?prompt=${encodeURIComponent(prompt)}`);
+  }
+
+  if (image) {
+    const sizeInMb = image.size / 1000000;
+    if (sizeInMb >= 4.5) {
+      return Response.redirect(
+        `/?message=${encodeURIComponent(
+          "Sorry, we don't support direct share of images greater than 4.5Mb. Please upload it here instead."
+        )}`
+      );
     }
-    let exports = {};
-    const require = depUri => singleRequire(depUri, uri);
-    const specialDeps = {
-      module: { uri },
-      exports,
-      require
-    };
-    registry[uri] = Promise.all(depsNames.map(
-      depName => specialDeps[depName] || require(depName)
-    )).then(deps => {
-      factory(...deps);
-      return exports;
-    });
-  };
+  }
+
+  return fetch(request);
 }
-define(['./workbox-9c126171'], (function (workbox) { 'use strict';
-
-  importScripts("worker-development.js");
-  workbox.enable();
-  self.skipWaiting();
-  workbox.clientsClaim();
-  workbox.registerRoute("/", new workbox.NetworkFirst({
-    "cacheName": "start-url",
-    plugins: [{
-      cacheWillUpdate: async ({
-        request,
-        response,
-        event,
-        state
-      }) => {
-        if (response && response.type === 'opaqueredirect') {
-          return new Response(response.body, {
-            status: 200,
-            statusText: 'OK',
-            headers: response.headers
-          });
-        }
-        return response;
-      }
-    }]
-  }), 'GET');
-  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
-    "cacheName": "dev",
-    plugins: []
-  }), 'GET');
-
-}));
-//# sourceMappingURL=sw.js.map
