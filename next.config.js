@@ -38,24 +38,23 @@ const nextConfig = {
 const isDev = process.env.NODE_ENV !== "production";
 
 const withPWA = nextPWA({
-  // buildExcludes: [
-  //   ({ asset, compilation }) => {
-  //     if (
-  //       asset.name.startsWith("server/") ||
-  //       asset.name.match(
-  //         /^((app-|^)build-manifest\.json|react-loadable-manifest\.json)$/
-  //       )
-  //     ) {
-  //       return true;
-  //     }
-  //     if (isDev && !asset.name.startsWith("static/runtime/")) {
-  //       return true;
-  //     }
-  //     return false;
-  //   },
-  //   // ["*"],
-  // ],
-  buildExcludes: ["**/*"],
+  buildExcludes: [
+    ({ asset, compilation }) => {
+      if (
+        asset.name.startsWith("server/") ||
+        asset.name.match(
+          /^((app-|^)build-manifest\.json|react-loadable-manifest\.json)$/
+        )
+      ) {
+        return true;
+      }
+      if (isDev && !asset.name.startsWith("static/runtime/")) {
+        return true;
+      }
+      return false;
+    },
+    "/_next/static/chunks/app/layout.*",
+  ],
   dest: "public",
   customWorkerDir: "worker",
 });
