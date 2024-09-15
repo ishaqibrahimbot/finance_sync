@@ -1,5 +1,3 @@
-declare let self: ServiceWorkerGlobalScope;
-
 self.addEventListener("install", (event) => {
   console.log("Service worker installed");
 });
@@ -15,13 +13,13 @@ self.addEventListener("fetch", async (event) => {
   }
 });
 
-async function handleRequest(request: Request) {
+async function handleRequest(request) {
   console.log("HANDLING POST FROM '/'");
 
   const clonedRequest = request.clone();
   const formData = await clonedRequest.formData();
-  const prompt = formData.get("prompt") as string | undefined;
-  const image = formData.get("image") as File | undefined;
+  const prompt = formData.get("prompt");
+  const image = formData.get("image");
   console.log("PROMPT: ", prompt);
 
   if (prompt) {
@@ -44,7 +42,7 @@ async function handleRequest(request: Request) {
   return Response.redirect(`/?file=${encodeURIComponent(fileId)}`);
 }
 
-export async function saveFileToIndexedDB(image: File): Promise<string> {
+async function saveFileToIndexedDB(image) {
   return new Promise((resolve, reject) => {
     const dbName = "ImageStorage";
     const dbVersion = 1;
