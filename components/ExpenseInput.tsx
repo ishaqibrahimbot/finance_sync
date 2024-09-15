@@ -28,7 +28,7 @@ export default function ExpenseInput() {
     console.log("got this prompt", prompt);
     setInput(prompt!);
     inputRef?.current?.focus();
-    router.push("/");
+    router.replace("/");
   }
 
   if (queryParams.has("message")) {
@@ -38,7 +38,7 @@ export default function ExpenseInput() {
         ? "We could not find the shared image. Please try again"
         : message
     );
-    router.push("/");
+    router.replace("/");
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
