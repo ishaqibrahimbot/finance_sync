@@ -12,20 +12,27 @@ export default function PreviewImage() {
   const queryParams = useSearchParams();
   const router = useRouter();
 
-  if (queryParams.has("file")) {
-    const fileId = queryParams.get("file");
-    generateObjectUrl(fileId as string).then((url) => {
-      setPreviewImageUrl(url);
-      router.replace("/");
-    });
-  }
-
   useEffect(() => {
-    if (previewImageUrl) setModalOpen(true);
-  }, [previewImageUrl]);
+    const showPreviewImage = async () => {
+      const fileId = queryParams.get("file");
+      const imageUrl = await generateObjectUrl(fileId as string);
+      setPreviewImageUrl(imageUrl);
+      setModalOpen(true);
+    };
+
+    if (queryParams.has("file")) {
+      showPreviewImage();
+    }
+  }, [queryParams]);
 
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog
+      open={modalOpen}
+      onOpenChange={(open) => {
+        setModalOpen(open);
+        !open && queryParams.has("file") && router.replace("/");
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Preview your image</DialogTitle>
