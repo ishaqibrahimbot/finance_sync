@@ -28,15 +28,6 @@ async function handleRequest(request) {
 
   if (!image) return Response.json({ error: "missing data" }, { status: 400 });
 
-  const sizeInMb = image.size / 1000000;
-  if (sizeInMb >= 4.5) {
-    return Response.redirect(
-      `/?message=${encodeURIComponent(
-        "Sorry, we don't support direct share of images greater than 4.5Mb. Please upload it here instead."
-      )}`
-    );
-  }
-
   const fileId = await saveFileToIndexedDB(image);
 
   return Response.redirect(`/?file=${encodeURIComponent(fileId)}`);
