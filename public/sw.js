@@ -9,18 +9,34 @@ self.addEventListener("fetch", async (event) => {
   const url = new URL(event.request.url);
 
   if (url.pathname === "/" && event.request.method === "POST") {
-    event.respondWith(handleRequest(event.request));
+    const clonedRequest = event.request.clone();
+    const contentTypeHeader = clonedRequest.headers.get("Content-Type");
+    if (!contentTypeHeader.includes("multipart/form-data")) {
+      event.respondWith(fetch(event.request));
+      return;
+    }
+
+    const formData = await clonedRequest.formData();
+    const keys = [...formData.keys()];
+    if (keys.includes("prompt") || keys.includes("image")) {
+      event.respondWith(handleRequest(event.request.clone()));
+      return;
+    }
   }
+
+  event.respondWith(fetch(event.request));
 });
 
 async function handleRequest(request) {
   console.log("HANDLING POST FROM '/'");
 
-  const clonedRequest = request.clone();
-  const formData = await clonedRequest.formData();
+  const formData = await request.formData();
   const prompt = formData.get("prompt");
   const image = formData.get("image");
-  console.log("PROMPT: ", prompt);
+
+  for (const key of formData.keys()) {
+    console.log(key);
+  }
 
   if (prompt) {
     return Response.redirect(`/?prompt=${encodeURIComponent(prompt)}`);
