@@ -1,14 +1,23 @@
 "use client";
 
-import { generateObjectUrl } from "@/lib/indexed-db";
+import {
+  deleteImage,
+  generateObjectUrl,
+  getImageAndDelete,
+} from "@/lib/indexed-db";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { safeExecuteAction } from "@/lib/utils";
 
-export default function PreviewImage() {
+export default function PreviewImage({
+  setImage,
+}: {
+  setImage: Dispatch<SetStateAction<File | null>>;
+}) {
   const [previewImageUrl, setPreviewImageUrl] = useState<string>();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const queryParams = useSearchParams();
@@ -24,12 +33,15 @@ export default function PreviewImage() {
 
     if (queryParams.has("file")) {
       showPreviewImage();
+    } else {
+      setPreviewImageUrl("");
+      setModalOpen(false);
     }
   }, [queryParams]);
 
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-      <DialogContent>
+    <Dialog open={modalOpen}>
+      <DialogContent hideCloseButton>
         <DialogHeader>
           <DialogTitle>Preview your image</DialogTitle>
         </DialogHeader>
@@ -46,20 +58,45 @@ export default function PreviewImage() {
           )}
         </div>
         <div className="flex flex-row w-full items-center space-x-2">
-          <Button>Confirm</Button>
           <Button
+            className="w-full"
+            onClick={async () => {
+              // extract the file object from db, set it in state,
+              // and clear the indexeddb entry
+
+              const fileId = queryParams.get("file");
+
+              if (!fileId) return;
+
+              await safeExecuteAction({
+                id: "getImage",
+                action: async () => await getImageAndDelete(fileId),
+                onSuccess: async (image: File) => {
+                  console.log("Image: ", image);
+                  setImage(image);
+                  router.replace("/");
+                },
+              });
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            className="w-full"
             onClick={async () => {
               // remove the image from indexedDB and remove the query param
               const fileId = queryParams.get("file");
 
-              const request = indexedDB.open("ImageStorage", 1);
+              if (!fileId) return;
 
-              request.onerror = (event) =>
-                toast.error("Something went wrong while clearing the image");
-
-              request.onsuccess = (event) => {
-                const db = request.result;
-              };
+              await safeExecuteAction({
+                id: "clearImage",
+                action: async () => await deleteImage(fileId),
+                onSuccess: () => {
+                  toast.info("Image cleared from db!");
+                  router.replace("/");
+                },
+              });
             }}
             variant={"destructive"}
           >

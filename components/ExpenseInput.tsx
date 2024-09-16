@@ -11,6 +11,7 @@ import { safeExecuteAction } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Compressor from "compressorjs";
+import PreviewImage from "./PreviewImage";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
@@ -83,94 +84,97 @@ export default function ExpenseInput() {
   };
 
   return (
-    <Card className="fixed bg-slate-300 bottom-0 left-0 right-0 border-t rounded-t-xl">
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          <Textarea
-            value={input}
-            ref={inputRef}
-            name="rawExpenseText"
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Spent a fortune on chocolate bars..."
-            className="w-full min-h-[100px] resize-none rounded-xl"
-          />
-          <div className="flex justify-between items-center">
-            <div className="flex items-center justify-start space-x-2">
+    <>
+      <PreviewImage setImage={setImage} />
+      <Card className="fixed bg-slate-300 bottom-0 left-0 right-0 border-t rounded-t-xl">
+        <CardContent className="p-4">
+          <div className="space-y-4">
+            <Textarea
+              value={input}
+              ref={inputRef}
+              name="rawExpenseText"
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Spent a fortune on chocolate bars..."
+              className="w-full min-h-[100px] resize-none rounded-xl"
+            />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center justify-start space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => imageUploadInputRef.current?.click()}
+                  className="h-10 px-4 rounded-lg border-2 border-gray-300"
+                >
+                  <ImageIcon className="h-5 w-5 mr-2" />
+                  Upload
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => imageCaptureInputRef.current?.click()}
+                  className="h-10 px-4 rounded-lg border-2 border-gray-300"
+                >
+                  <CameraIcon className="h-5 w-5 mr-2" />
+                  Capture
+                </Button>
+              </div>
+              <input
+                type="file"
+                ref={imageUploadInputRef}
+                id="image-upload"
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <input
+                type="file"
+                ref={imageCaptureInputRef}
+                id="image-capture"
+                onChange={handleImageUpload}
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+              />
               <Button
-                type="button"
-                variant="outline"
+                loading={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  const formData = new FormData();
+                  formData.append("rawExpenseText", input);
+                  if (image) {
+                    formData.append("image", image);
+                  }
+                  // used in a protected route, userId must be defined
+                  await safeExecuteAction({
+                    id: "addExpense",
+                    action: async () => {
+                      await addExpense({ formData, userId: userId! });
+                    },
+                    onSuccess: () => {
+                      setInput("");
+                      setImage(null);
+                    },
+                  });
+                  setLoading(false);
+                }}
                 size="sm"
-                onClick={() => imageUploadInputRef.current?.click()}
-                className="h-10 px-4 rounded-lg border-2 border-gray-300"
+                className="h-10 px-6 rounded-lg"
+                disabled={!input.trim() && !image}
               >
-                <ImageIcon className="h-5 w-5 mr-2" />
-                Upload
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => imageCaptureInputRef.current?.click()}
-                className="h-10 px-4 rounded-lg border-2 border-gray-300"
-              >
-                <CameraIcon className="h-5 w-5 mr-2" />
-                Capture
+                <SendIcon className="h-5 w-5 mr-2" />
+                Add
               </Button>
             </div>
-            <input
-              type="file"
-              ref={imageUploadInputRef}
-              id="image-upload"
-              onChange={handleImageUpload}
-              accept="image/*"
-              className="hidden"
-            />
-            <input
-              type="file"
-              ref={imageCaptureInputRef}
-              id="image-capture"
-              onChange={handleImageUpload}
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-            />
-            <Button
-              loading={loading}
-              onClick={async () => {
-                setLoading(true);
-                const formData = new FormData();
-                formData.append("rawExpenseText", input);
-                if (image) {
-                  formData.append("image", image);
-                }
-                // used in a protected route, userId must be defined
-                await safeExecuteAction({
-                  id: "addExpense",
-                  action: async () => {
-                    await addExpense({ formData, userId: userId! });
-                  },
-                  onSuccess: () => {
-                    setInput("");
-                    setImage(null);
-                  },
-                });
-                setLoading(false);
-              }}
-              size="sm"
-              className="h-10 px-6 rounded-lg"
-              disabled={!input.trim() && !image}
-            >
-              <SendIcon className="h-5 w-5 mr-2" />
-              Add
-            </Button>
+            {image && (
+              <div className="text-sm text-muted-foreground">
+                Image attached: {image.name}
+              </div>
+            )}
           </div>
-          {image && (
-            <div className="text-sm text-muted-foreground">
-              Image attached: {image.name}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 }

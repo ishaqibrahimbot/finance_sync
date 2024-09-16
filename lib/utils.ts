@@ -18,8 +18,8 @@ export async function safeExecuteAction({
   onSuccess?: (...args: any) => any;
 }) {
   try {
-    await action();
-    onSuccess && onSuccess();
+    const result = await action();
+    onSuccess && (await onSuccess(result));
   } catch (err) {
     console.log(`${id} error:`, err);
     toast(
