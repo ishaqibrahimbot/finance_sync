@@ -17,7 +17,7 @@ self.addEventListener("fetch", async (event) => {
 async function handleRequest(request) {
   console.log("HANDLING POST FROM '/'");
 
-  const clonedRequest = event.request.clone();
+  const clonedRequest = request.clone();
   const contentTypeHeader = clonedRequest.headers.get("Content-Type");
 
   if (!contentTypeHeader.includes("multipart/form-data")) {
