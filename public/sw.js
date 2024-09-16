@@ -6,6 +6,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", async (event) => {
+  console.log("event.request.url", event.request.url);
   const url = new URL(event.request.url);
 
   if (url.pathname === "/" && event.request.method === "POST") {
