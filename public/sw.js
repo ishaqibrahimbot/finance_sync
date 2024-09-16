@@ -21,14 +21,14 @@ async function handleRequest(request) {
   const contentTypeHeader = clonedRequest.headers.get("Content-Type");
 
   if (!contentTypeHeader.includes("multipart/form-data")) {
-    return;
+    return fetch(request);
   }
 
   const formData = await clonedRequest.formData();
   const keys = [...formData.keys()];
 
   if (!(keys.includes("prompt") || keys.includes("image"))) {
-    return;
+    return fetch(request);
   }
 
   const prompt = formData.get("prompt");
