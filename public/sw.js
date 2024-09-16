@@ -12,7 +12,6 @@ self.addEventListener("fetch", async (event) => {
     const clonedRequest = event.request.clone();
     const contentTypeHeader = clonedRequest.headers.get("Content-Type");
     if (!contentTypeHeader.includes("multipart/form-data")) {
-      event.respondWith(fetch(event.request));
       return;
     }
 
@@ -23,8 +22,6 @@ self.addEventListener("fetch", async (event) => {
       return;
     }
   }
-
-  event.respondWith(fetch(event.request));
 });
 
 async function handleRequest(request) {
