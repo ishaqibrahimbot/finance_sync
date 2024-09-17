@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ImageIcon, SendIcon, CameraIcon } from "lucide-react";
+import { ImageIcon, SendIcon, CameraIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -98,28 +98,44 @@ export default function ExpenseInput() {
               className="w-full min-h-[100px] resize-none rounded-xl"
             />
             <div className="flex justify-between items-center">
-              <div className="flex items-center justify-start space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => imageUploadInputRef.current?.click()}
-                  className="h-10 px-4 rounded-lg border-2 border-gray-300"
-                >
-                  <ImageIcon className="h-5 w-5 mr-2" />
-                  Upload
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => imageCaptureInputRef.current?.click()}
-                  className="h-10 px-4 rounded-lg border-2 border-gray-300"
-                >
-                  <CameraIcon className="h-5 w-5 mr-2" />
-                  Capture
-                </Button>
-              </div>
+              {image ? (
+                <div className="w-full flex flex-row justify-start items-center space-x-2">
+                  <Button
+                    size={"sm"}
+                    aria-label="Remove Selected Image"
+                    variant={"destructive"}
+                    onClick={() => setImage(null)}
+                  >
+                    <Trash2Icon className="h-5 w-5" />
+                  </Button>
+                  <div className="text-sm text-muted-foreground">
+                    Image attached: {image.name}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-start space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => imageUploadInputRef.current?.click()}
+                    className="h-10 px-4 rounded-lg border-2 border-gray-300"
+                  >
+                    <ImageIcon className="h-5 w-5 mr-2" />
+                    Upload
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => imageCaptureInputRef.current?.click()}
+                    className="h-10 px-4 rounded-lg border-2 border-gray-300"
+                  >
+                    <CameraIcon className="h-5 w-5 mr-2" />
+                    Capture
+                  </Button>
+                </div>
+              )}
               <input
                 type="file"
                 ref={imageUploadInputRef}
@@ -167,11 +183,6 @@ export default function ExpenseInput() {
                 Add
               </Button>
             </div>
-            {image && (
-              <div className="text-sm text-muted-foreground">
-                Image attached: {image.name}
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
