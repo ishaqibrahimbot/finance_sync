@@ -8,16 +8,6 @@ export default function ServiceWorkerRegistration() {
       scope: "/",
       updateViaCache: "none",
     });
-
-    toast.info("Service worker registered with scope: " + registration.scope);
-
-    if (registration.active) {
-      toast.info("Service worker activated!");
-    }
-
-    registration.addEventListener("updatefound", (event) => {
-      toast.info("Found update for service worker");
-    });
   }
 
   useEffect(() => {
