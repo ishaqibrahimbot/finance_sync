@@ -1,6 +1,12 @@
 import { Expense } from "@/app/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarIcon, DollarSignIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  CircleAlertIcon,
+  DollarSignIcon,
+  LoaderCircleIcon,
+} from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 interface ExpenseItemProps {
   expense: Expense;
@@ -8,6 +14,32 @@ interface ExpenseItemProps {
 }
 
 export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
+  if (expense.processingStatus !== "completed") {
+    return (
+      <Card className="bg-muted">
+        <CardContent className="p-4 space-y-2">
+          {expense.processingStatus === "processing" ? (
+            <div className="flex flex-row items-center space-x-2">
+              <LoaderCircleIcon className="h-5 w-5 animate-spin" />
+              <p className="text-sm text-muted-foreground">{`Processing...`}</p>
+            </div>
+          ) : (
+            <div className="flex flex-row items-center space-x-2">
+              <CircleAlertIcon className="h-4 w-4 text-red-600" />
+              <p className="text-sm text-muted-foreground">{`Failed to process this source`}</p>
+            </div>
+          )}
+          {expense.sourceText && (
+            <p className="text-sm line-clamp-1">{`Text: ${expense.sourceText}`}</p>
+          )}
+          {expense.attachment && (
+            <p className="text-sm">{`Attachment: ${expense.attachment}`}</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card
       className="cursor-pointer hover:bg-accent transition-colors"

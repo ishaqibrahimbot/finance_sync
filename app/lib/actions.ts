@@ -10,7 +10,11 @@ export async function getExpenses(userId: string) {
   const expenses: Expense[] = await result.json();
   expenses.sort((a, b) => {
     if (a.date > b.date) return -1;
-    else return 1;
+    else if (a.date < b.date) return 1;
+    else {
+      if (a.createdAt > b.createdAt) return -1;
+      else return 1;
+    }
   });
   return expenses;
 }
