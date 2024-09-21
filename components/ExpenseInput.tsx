@@ -42,50 +42,47 @@ export default function ExpenseInput() {
     router.replace("/");
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      console.log("original file size", file.size);
-      console.log("original file type", file.type);
+  const handleImageUpload = (file: File) => {
+    console.log("original file size", file.size);
+    console.log("original file type", file.type);
 
-      const promise = new Promise<File>(
-        (resolve, reject) =>
-          new Compressor(file, {
-            quality: 0.8,
-            retainExif: true,
-            width: 2048,
-            success: (file) => {
-              resolve(file as File);
-            },
-            error: reject,
-          })
-      );
+    const promise = new Promise<File>(
+      (resolve, reject) =>
+        new Compressor(file, {
+          quality: 0.8,
+          retainExif: true,
+          width: 2048,
+          success: (file) => {
+            resolve(file as File);
+          },
+          error: reject,
+        })
+    );
 
-      toast.promise(promise, {
-        loading: "Compressing your image...",
-        success(data: File) {
-          console.log("new file size", data.size);
-          console.log("new file type", data.type);
-          console.log("file", data.name);
-          setImage(data);
+    toast.promise(promise, {
+      loading: "Compressing your image...",
+      success(data: File) {
+        console.log("new file size", data.size);
+        console.log("new file type", data.type);
+        console.log("file", data.name);
+        setImage(data);
 
-          return "Done! Your image is ready to be sent.";
-        },
-        error(data) {
-          if (imageUploadInputRef?.current)
-            imageUploadInputRef.current.value = "";
-          if (imageCaptureInputRef?.current)
-            imageCaptureInputRef.current.value = "";
-          console.error(data);
-          return "Something went wrong while compressing your image. Please try again";
-        },
-      });
-    }
+        return "Done! Your image is ready to be sent.";
+      },
+      error(data) {
+        if (imageUploadInputRef?.current)
+          imageUploadInputRef.current.value = "";
+        if (imageCaptureInputRef?.current)
+          imageCaptureInputRef.current.value = "";
+        console.error(data);
+        return "Something went wrong while compressing your image. Please try again";
+      },
+    });
   };
 
   return (
     <>
-      <PreviewImage setImage={setImage} />
+      <PreviewImage handleImageUpload={handleImageUpload} />
       <Card className="fixed bg-slate-300 bottom-0 left-0 right-0 border-t rounded-t-xl">
         <CardContent className="p-4">
           <div className="space-y-4">
@@ -140,7 +137,11 @@ export default function ExpenseInput() {
                 type="file"
                 ref={imageUploadInputRef}
                 id="image-upload"
-                onChange={handleImageUpload}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  handleImageUpload(file);
+                }}
                 accept="image/*"
                 className="hidden"
               />
@@ -148,7 +149,11 @@ export default function ExpenseInput() {
                 type="file"
                 ref={imageCaptureInputRef}
                 id="image-capture"
-                onChange={handleImageUpload}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  handleImageUpload(file);
+                }}
                 accept="image/*"
                 capture="environment"
                 className="hidden"

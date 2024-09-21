@@ -8,9 +8,9 @@ import { Button } from "./ui/button";
 import { toast } from "sonner";
 
 export default function PreviewImage({
-  setImage,
+  handleImageUpload,
 }: {
-  setImage: Dispatch<SetStateAction<File | null>>;
+  handleImageUpload: (file: File) => void;
 }) {
   const [previewImageUrl, setPreviewImageUrl] = useState<string>();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -68,7 +68,7 @@ export default function PreviewImage({
                 if (imageResponse) {
                   const formData = await imageResponse.formData();
                   const image = formData.get("image") as File;
-                  setImage(image);
+                  handleImageUpload(image);
                   await cache.delete("shared_image");
                   router.replace("/");
                 }
