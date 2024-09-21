@@ -22,8 +22,9 @@ export default function PreviewImage({
       const cache = await caches.open("shared_image");
       const imageResponse = await cache.match("shared_image");
       if (imageResponse) {
-        const blob = await imageResponse.blob();
-        const imageUrl = URL.createObjectURL(blob);
+        const formData = await imageResponse.formData();
+        const image = formData.get("image") as File;
+        const imageUrl = URL.createObjectURL(image);
         setPreviewImageUrl(imageUrl);
         setModalOpen(true);
       }
@@ -65,8 +66,8 @@ export default function PreviewImage({
                 const cache = await caches.open("shared_image");
                 const imageResponse = await cache.match("shared_image");
                 if (imageResponse) {
-                  const blob = await imageResponse.blob();
-                  const image = new File([blob], "shared-image");
+                  const formData = await imageResponse.formData();
+                  const image = formData.get("image") as File;
                   setImage(image);
                   await cache.delete("shared_image");
                   router.replace("/");

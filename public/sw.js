@@ -41,7 +41,7 @@ async function handleRequest(request) {
   if (!image) return Response.json({ error: "missing data" }, { status: 400 });
 
   const cache = await caches.open("shared_image");
-  await cache.put("shared_image", new Response(image));
+  await cache.put("shared_image", new Response(formData));
 
   return Response.redirect(`/?shared_image=true`);
 }
