@@ -25,9 +25,9 @@ async function handleRequest(request) {
   }
 
   const formData = await clonedRequest.formData();
-  const keys = [...formData.keys()];
+  const formKeys = [...formData.keys()];
 
-  if (!(keys.includes("prompt") || keys.includes("image"))) {
+  if (!(formKeys.includes("prompt") || formKeys.includes("image"))) {
     return await fetch(request);
   }
 
@@ -40,35 +40,36 @@ async function handleRequest(request) {
 
   if (!image) return Response.json({ error: "missing data" }, { status: 400 });
 
-  const fileId = await saveFileToIndexedDB(image);
+  const cache = await caches.open("shared_image");
+  await cache.put("shared_image", new Response(image));
 
-  return Response.redirect(`/?file=${encodeURIComponent(fileId)}`);
+  return Response.redirect(`/?shared_image=true`);
 }
 
-async function saveFileToIndexedDB(image) {
-  return new Promise((resolve, reject) => {
-    const dbName = "ImageStorage";
-    const dbVersion = 1;
-    const request = indexedDB.open(dbName, dbVersion);
+// async function saveFileToIndexedDB(image) {
+//   return new Promise((resolve, reject) => {
+//     const dbName = "ImageStorage";
+//     const dbVersion = 1;
+//     const request = indexedDB.open(dbName, dbVersion);
 
-    request.onerror = (event) => reject("IndexedDB error");
+//     request.onerror = (event) => reject("IndexedDB error");
 
-    request.onsuccess = (event) => {
-      // @ts-ignore
-      const db = event.target?.result;
-      const transaction = db.transaction(["files"], "readwrite");
-      const store = transaction.objectStore("files");
-      const fileId = Date.now().toString();
-      const saveRequest = store.add({ id: fileId, file: image });
+//     request.onsuccess = (event) => {
+//       // @ts-ignore
+//       const db = event.target?.result;
+//       const transaction = db.transaction(["files"], "readwrite");
+//       const store = transaction.objectStore("files");
+//       const fileId = Date.now().toString();
+//       const saveRequest = store.add({ id: fileId, file: image });
 
-      saveRequest.onsuccess = () => resolve(fileId);
-      saveRequest.onerror = () => reject("Error saving file");
-    };
+//       saveRequest.onsuccess = () => resolve(fileId);
+//       saveRequest.onerror = () => reject("Error saving file");
+//     };
 
-    request.onupgradeneeded = (event) => {
-      // @ts-ignore
-      const db = event.target?.result;
-      db.createObjectStore("files", { keyPath: "id" });
-    };
-  });
-}
+//     request.onupgradeneeded = (event) => {
+//       // @ts-ignore
+//       const db = event.target?.result;
+//       db.createObjectStore("files", { keyPath: "id" });
+//     };
+//   });
+// }

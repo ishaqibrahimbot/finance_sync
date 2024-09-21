@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  deleteImage,
-  generateObjectUrl,
-  getImageAndDelete,
-} from "@/lib/indexed-db";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import { safeExecuteAction } from "@/lib/utils";
 
 export default function PreviewImage({
   setImage,
@@ -25,13 +19,17 @@ export default function PreviewImage({
 
   useEffect(() => {
     const showPreviewImage = async () => {
-      const fileId = queryParams.get("file");
-      const imageUrl = await generateObjectUrl(fileId as string);
-      setPreviewImageUrl(imageUrl);
-      setModalOpen(true);
+      const cache = await caches.open("shared_image");
+      const imageResponse = await cache.match("shared_image");
+      if (imageResponse) {
+        const blob = await imageResponse.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setPreviewImageUrl(imageUrl);
+        setModalOpen(true);
+      }
     };
 
-    if (queryParams.has("file")) {
+    if (queryParams.has("shared_image")) {
       showPreviewImage();
     } else {
       setPreviewImageUrl("");
@@ -61,22 +59,22 @@ export default function PreviewImage({
           <Button
             className="w-full"
             onClick={async () => {
-              // extract the file object from db, set it in state,
-              // and clear the indexeddb entry
+              // set image in state and clear from cache
 
-              const fileId = queryParams.get("file");
-
-              if (!fileId) return;
-
-              await safeExecuteAction({
-                id: "getImage",
-                action: async () => await getImageAndDelete(fileId),
-                onSuccess: async (image: File) => {
-                  console.log("Image: ", image);
+              try {
+                const cache = await caches.open("shared_image");
+                const imageResponse = await cache.match("shared_image");
+                if (imageResponse) {
+                  const blob = await imageResponse.blob();
+                  const image = new File([blob], "shared-image");
                   setImage(image);
+                  await cache.delete("shared_image");
                   router.replace("/");
-                },
-              });
+                }
+              } catch (err) {
+                console.error(err);
+                toast.error("Something went wrong. Unable to set this image");
+              }
             }}
           >
             Confirm
@@ -84,19 +82,17 @@ export default function PreviewImage({
           <Button
             className="w-full"
             onClick={async () => {
-              // remove the image from indexedDB and remove the query param
-              const fileId = queryParams.get("file");
-
-              if (!fileId) return;
-
-              await safeExecuteAction({
-                id: "clearImage",
-                action: async () => await deleteImage(fileId),
-                onSuccess: () => {
-                  toast.info("Image cleared from db!");
-                  router.replace("/");
-                },
-              });
+              // remove the image from cache and remove the query param
+              try {
+                const cache = await caches.open("shared_image");
+                await cache.delete("shared_image");
+                router.replace("/");
+              } catch (err) {
+                console.error(err);
+                toast.error(
+                  "Something went wrong. Unable to clear shared image from cache"
+                );
+              }
             }}
             variant={"destructive"}
           >
