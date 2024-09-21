@@ -19,6 +19,11 @@ export async function getExpenses(userId: string) {
   return expenses;
 }
 
+export async function revalidate(path: string) {
+  await revalidatePath(path);
+  return;
+}
+
 export async function addExpense({
   formData,
   userId,
