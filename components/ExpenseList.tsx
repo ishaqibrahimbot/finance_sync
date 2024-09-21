@@ -12,12 +12,6 @@ interface ExpenseListProps {
 export default function ExpenseList({ expenses }: ExpenseListProps) {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
-  const hasProcessingExpenses = expenses.some(
-    (expense) => expense.processingStatus === "processing"
-  );
-
-  console.log("has processing", hasProcessingExpenses);
-
   return (
     <div className="my-8">
       <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">

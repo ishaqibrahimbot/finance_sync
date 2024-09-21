@@ -43,8 +43,8 @@ export default function ExpenseInput() {
   }
 
   const handleImageUpload = (file: File) => {
-    console.log("original file size", file.size);
-    console.log("original file type", file.type);
+    // console.log("original file size", file.size);
+    // console.log("original file type", file.type);
 
     const promise = new Promise<File>(
       (resolve, reject) =>
@@ -62,10 +62,15 @@ export default function ExpenseInput() {
     toast.promise(promise, {
       loading: "Compressing your image...",
       success(data: File) {
-        console.log("new file size", data.size);
-        console.log("new file type", data.type);
-        console.log("file", data.name);
+        // console.log("new file size", data.size);
+        // console.log("new file type", data.type);
+        // console.log("file", data.name);
         setImage(data);
+
+        if (imageUploadInputRef?.current)
+          imageUploadInputRef.current.value = "";
+        if (imageCaptureInputRef?.current)
+          imageCaptureInputRef.current.value = "";
 
         return "Done! Your image is ready to be sent.";
       },
