@@ -1,15 +1,12 @@
 "use client";
 import { Expense } from "@/app/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  CalendarIcon,
-  CircleAlertIcon,
-  DollarSignIcon,
-  LoaderCircleIcon,
-} from "lucide-react";
-import { Skeleton } from "./ui/skeleton";
+import { CalendarIcon, CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { revalidate } from "@/app/lib/actions";
+import { deleteExpense, revalidate } from "@/app/lib/actions";
+import { Button } from "./ui/button";
+import { safeExecuteAction } from "@/lib/utils";
+import { useAuth } from "@clerk/nextjs";
 
 interface ExpenseItemProps {
   expense: Expense;
@@ -18,6 +15,8 @@ interface ExpenseItemProps {
 
 export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
   const intervalIdRef = useRef<any>();
+  const [loading, setLoading] = useState(false);
+  const { userId } = useAuth();
 
   const revalidateExpenses = async () => {
     await revalidate("/");
@@ -58,18 +57,42 @@ export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
           {expense.sourceText && (
             <p className="text-sm line-clamp-1">{`Text: ${expense.sourceText}`}</p>
           )}
-          {expense.attachment && (
-            <p className="text-sm">
-              <a
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-sm underline text-gray-800"
-                href={expense.attachment}
+          <div className="flex flex-row space-x-4 items-center">
+            {expense.attachment && (
+              <p className="text-sm">
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-sm underline text-gray-800"
+                  href={expense.attachment}
+                >
+                  View attachment
+                </a>
+              </p>
+            )}
+            {expense.processingStatus === "failed" && (
+              <Button
+                loading={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  await safeExecuteAction({
+                    id: "deleteExpense",
+                    action: async () => {
+                      await deleteExpense({
+                        expenseId: expense.expenseId,
+                        userId: userId!,
+                      });
+                    },
+                  });
+                  setLoading(false);
+                }}
+                variant={"link"}
+                size={"sm"}
               >
-                View attachment
-              </a>
-            </p>
-          )}
+                Delete
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
