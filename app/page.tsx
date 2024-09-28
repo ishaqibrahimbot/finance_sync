@@ -1,61 +1,55 @@
-import ExpenseInput from "@/components/ExpenseInput";
-import ExpenseList from "@/components/ExpenseList";
-import { getExpenses } from "./lib/actions";
-import { auth } from "@clerk/nextjs/server";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Image from "next/image";
-import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+"use client";
+import { DragScreenshot } from "@/components/DragScreenshot";
+import { DragTarget } from "@/components/DragTarget";
+import { Section } from "@/components/ui/section";
+import { cn } from "@/lib/utils";
+import { ArrowRight, ArrowRightIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export const maxDuration = 60;
 
-export default async function Home() {
-  const { userId } = await auth();
+export default function Home() {
+  const [imageHidden, setImageHidden] = useState(false);
+  const [showArrow, setShowArrow] = useState(false);
+  const hideImage = () => {
+    setImageHidden(true);
+  };
 
-  if (!userId) {
-    return (
-      <div className="flex flex-col items-center justify-start min-h-screen bg-slate-100">
-        <Image
-          className="-mt-8"
-          width={280}
-          height={280}
-          alt="finance sync logo"
-          src="/landing-page-image.png"
-        />
-        <Card className="w-[350px]">
-          <CardHeader className="space-y-2">
-            <CardTitle>Welcome to Yet Another Finance App</CardTitle>
-            <CardDescription>Sign in or sign up to get started</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <Button asChild>
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/sign-up">Sign Up</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const expenses = await getExpenses(userId);
-
+  useEffect(() => {
+    if (imageHidden) {
+      setTimeout(() => {
+        setShowArrow(true);
+      }, 2000);
+    }
+  }, [imageHidden]);
   return (
-    <>
-      <ServiceWorkerRegistration />
-      <div className="container mx-auto p-4 pb-32">
-        <ExpenseList expenses={expenses} />
-        <ExpenseInput />
+    <DndProvider backend={HTML5Backend}>
+      <div>
+        <Section>
+          <h2 className="text-[#7c6015] text-center">
+            Just ordered some food? Got a screenshot?
+          </h2>
+          <h3 className="text-center text-[#7c6015]">
+            Drag the screenshot to the app
+          </h3>
+          <div className="py-10 flex flex-row justify-start items-center">
+            <div className="mr-40">
+              <DragScreenshot imageHidden={imageHidden} />
+            </div>
+            <div className="mr-5">
+              <DragTarget hideImage={hideImage} />
+            </div>
+            <ArrowRightIcon
+              className={cn(
+                "w-10 h-10 transition-transform duration-500",
+                showArrow ? "translate-x-40" : "translate-x-0 hidden"
+              )}
+            />
+          </div>
+        </Section>
       </div>
-    </>
+    </DndProvider>
   );
 }
