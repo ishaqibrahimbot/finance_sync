@@ -39,3 +39,16 @@ export const ExpensePostSchema = z.object({
 });
 
 export type ExpensePostBody = z.infer<typeof ExpensePostSchema>;
+
+export const LLMExpenseObjectSchema = ExpenseSchema.pick({
+  date: true,
+  amount: true,
+  currency: true,
+  category: true,
+  title: true,
+  paymentMethod: true,
+  tags: true,
+  notes: true,
+});
+
+export type LLMExpenseObject = z.infer<typeof LLMExpenseObjectSchema>;

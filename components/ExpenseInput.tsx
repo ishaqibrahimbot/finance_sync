@@ -29,7 +29,7 @@ export default function ExpenseInput() {
     console.log("got this prompt", prompt);
     setInput(prompt!);
     inputRef?.current?.focus();
-    router.replace("/");
+    router.replace("/dashboard");
   }
 
   if (queryParams.has("message")) {
@@ -39,7 +39,7 @@ export default function ExpenseInput() {
         ? "We could not find the shared image. Please try again"
         : message
     );
-    router.replace("/");
+    router.replace("/dashboard");
   }
 
   const handleImageUpload = (file: File) => {
@@ -88,117 +88,113 @@ export default function ExpenseInput() {
   return (
     <>
       <PreviewImage handleImageUpload={handleImageUpload} />
-      <Card className="fixed bg-slate-300 bottom-0 left-0 right-0 border-t rounded-t-xl">
-        <CardContent className="p-4">
-          <div className="space-y-4">
-            <Textarea
-              value={input}
-              ref={inputRef}
-              name="rawExpenseText"
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Spent a fortune on chocolate bars..."
-              className="w-full min-h-[100px] resize-none rounded-xl"
+      <div className="fixed bottom-4 left-4 right-4 sm:left-8 sm:mx-14 sm:right-8">
+        <div className="space-y-4 ring-1 px-4 pt-4 pb-16 ring-primary rounded-2xl bg-white focus-within:outline-none focus-within:ring-2 focus-within:ring-primary relative">
+          <Textarea
+            value={input}
+            ref={inputRef}
+            name="rawExpenseText"
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Spent a fortune on chocolate bars..."
+            className="w-full min-h-[80px] resize-none rounded-xl"
+          />
+          <div className="flex z-50 absolute bottom-0 p-2 left-1 right-1 justify-between items-center">
+            {image ? (
+              <div className="w-full flex flex-row justify-start items-center space-x-2">
+                <Button
+                  size={"sm"}
+                  aria-label="Remove Selected Image"
+                  variant={"destructive"}
+                  onClick={() => setImage(null)}
+                >
+                  <Trash2Icon className="h-5 w-5" />
+                </Button>
+                <div className="text-sm text-muted-foreground max-w-fit">
+                  Image attached:{" "}
+                  {image.name.length > 20
+                    ? image.name.slice(0, 20)
+                    : image.name}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-start space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => imageUploadInputRef.current?.click()}
+                >
+                  <ImageIcon className="h-5 w-5 mr-2" />
+                  Upload
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => imageCaptureInputRef.current?.click()}
+                >
+                  <CameraIcon className="h-5 w-5 mr-2" />
+                  Capture
+                </Button>
+              </div>
+            )}
+            <input
+              type="file"
+              ref={imageUploadInputRef}
+              id="image-upload"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                handleImageUpload(file);
+              }}
+              accept="image/*"
+              className="hidden"
             />
-            <div className="flex justify-between items-center">
-              {image ? (
-                <div className="w-full flex flex-row justify-start items-center space-x-2">
-                  <Button
-                    size={"sm"}
-                    aria-label="Remove Selected Image"
-                    variant={"destructive"}
-                    onClick={() => setImage(null)}
-                  >
-                    <Trash2Icon className="h-5 w-5" />
-                  </Button>
-                  <div className="text-sm text-muted-foreground max-w-36">
-                    Image attached:{" "}
-                    {image.name.length > 20
-                      ? image.name.slice(0, 20)
-                      : image.name}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-start space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => imageUploadInputRef.current?.click()}
-                    className="h-10 px-4 rounded-lg border-2 border-gray-300"
-                  >
-                    <ImageIcon className="h-5 w-5 mr-2" />
-                    Upload
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => imageCaptureInputRef.current?.click()}
-                    className="h-10 px-4 rounded-lg border-2 border-gray-300"
-                  >
-                    <CameraIcon className="h-5 w-5 mr-2" />
-                    Capture
-                  </Button>
-                </div>
-              )}
-              <input
-                type="file"
-                ref={imageUploadInputRef}
-                id="image-upload"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  handleImageUpload(file);
-                }}
-                accept="image/*"
-                className="hidden"
-              />
-              <input
-                type="file"
-                ref={imageCaptureInputRef}
-                id="image-capture"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  handleImageUpload(file);
-                }}
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-              />
-              <Button
-                loading={loading}
-                onClick={async () => {
-                  setLoading(true);
-                  const formData = new FormData();
-                  formData.append("rawExpenseText", input);
-                  if (image) {
-                    formData.append("image", image);
-                  }
-                  // used in a protected route, userId must be defined
-                  await safeExecuteAction({
-                    id: "addExpense",
-                    action: async () => {
-                      await addExpense({ formData, userId: userId! });
-                    },
-                    onSuccess: () => {
-                      setInput("");
-                      setImage(null);
-                    },
-                  });
-                  setLoading(false);
-                }}
-                size="sm"
-                className="h-10 px-6 rounded-lg"
-                disabled={!input.trim() && !image}
-              >
-                <SendIcon className="h-5 w-5 mr-2" />
-                Add
-              </Button>
-            </div>
+            <input
+              type="file"
+              ref={imageCaptureInputRef}
+              id="image-capture"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                handleImageUpload(file);
+              }}
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+            />
+            <Button
+              loading={loading}
+              onClick={async () => {
+                setLoading(true);
+                const formData = new FormData();
+                formData.append("rawExpenseText", input);
+                if (image) {
+                  formData.append("image", image);
+                }
+                // used in a protected route, userId must be defined
+                await safeExecuteAction({
+                  id: "addExpense",
+                  action: async () => {
+                    await addExpense({ formData, userId: userId! });
+                  },
+                  onSuccess: () => {
+                    setInput("");
+                    setImage(null);
+                  },
+                });
+                setLoading(false);
+              }}
+              size="sm"
+              className="h-10 px-6 rounded-lg"
+              disabled={!input.trim() && !image}
+            >
+              <SendIcon className="h-5 w-5 mr-2" />
+              Add
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </>
   );
 }

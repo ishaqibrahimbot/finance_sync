@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { ClerkProvider, SignedIn } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
-import { Menu } from "@/components/Menu";
+import { LinkedinIcon } from "lucide-react";
+import { Header } from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,16 +45,13 @@ export default function RootLayout({
           <meta name="theme-color" content="#ffffff" />
           <link rel="manifest" href="/manifest.json" />
         </head>
-        <body className={cn(inter.className, "bg-slate-100")}>
-          <SignedIn>
-            <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b p-4">
-              <div className="container mx-auto flex justify-between items-center">
-                <Menu />
-                <h1 className="text-xl font-bold">Yet Another Finance App</h1>
-              </div>
-            </header>
-          </SignedIn>
-          <main className="pt-12">{children}</main>
+        <body
+          className={cn(
+            inter.className,
+            "bg-background max-w-screen-xl mx-auto pt-4"
+          )}
+        >
+          <main className="w-full">{children}</main>
         </body>
         <Toaster />
       </html>

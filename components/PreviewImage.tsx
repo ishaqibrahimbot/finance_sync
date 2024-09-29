@@ -44,7 +44,7 @@ export default function PreviewImage({
         <DialogHeader>
           <DialogTitle>Preview your image</DialogTitle>
         </DialogHeader>
-        <div className="relative min-w-[300px] min-h-[500px] sm:min-w-[450px] bg-black/30 p-2">
+        <div className="relative min-w-[300px] min-h-[500px] sm:min-w-[450px] bg-background p-2">
           {previewImageUrl && (
             <Image
               style={{
@@ -70,7 +70,7 @@ export default function PreviewImage({
                   const image = formData.get("image") as File;
                   handleImageUpload(image);
                   await cache.delete("shared_image");
-                  router.replace("/");
+                  router.replace("/dashboard");
                 }
               } catch (err) {
                 console.error(err);
@@ -87,7 +87,7 @@ export default function PreviewImage({
               try {
                 const cache = await caches.open("shared_image");
                 await cache.delete("shared_image");
-                router.replace("/");
+                router.replace("/dashboard");
               } catch (err) {
                 console.error(err);
                 toast.error(
@@ -95,7 +95,7 @@ export default function PreviewImage({
                 );
               }
             }}
-            variant={"destructive"}
+            variant={"outline"}
           >
             Cancel
           </Button>

@@ -8,7 +8,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", async (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname === "/" && event.request.method === "POST") {
+  if (url.pathname === "/dashboard" && event.request.method === "POST") {
     event.respondWith(handleRequest(event.request));
   }
 });
@@ -32,7 +32,7 @@ async function handleRequest(request) {
   const image = formData.get("image");
 
   if (prompt) {
-    return Response.redirect(`/?prompt=${encodeURIComponent(prompt)}`);
+    return Response.redirect(`/dashboard?prompt=${encodeURIComponent(prompt)}`);
   }
 
   if (!image) return Response.json({ error: "missing data" }, { status: 400 });
@@ -40,33 +40,5 @@ async function handleRequest(request) {
   const cache = await caches.open("shared_image");
   await cache.put("shared_image", new Response(formData));
 
-  return Response.redirect(`/?shared_image=true`);
+  return Response.redirect(`/dashboard?shared_image=true`);
 }
-
-// async function saveFileToIndexedDB(image) {
-//   return new Promise((resolve, reject) => {
-//     const dbName = "ImageStorage";
-//     const dbVersion = 1;
-//     const request = indexedDB.open(dbName, dbVersion);
-
-//     request.onerror = (event) => reject("IndexedDB error");
-
-//     request.onsuccess = (event) => {
-//       // @ts-ignore
-//       const db = event.target?.result;
-//       const transaction = db.transaction(["files"], "readwrite");
-//       const store = transaction.objectStore("files");
-//       const fileId = Date.now().toString();
-//       const saveRequest = store.add({ id: fileId, file: image });
-
-//       saveRequest.onsuccess = () => resolve(fileId);
-//       saveRequest.onerror = () => reject("Error saving file");
-//     };
-
-//     request.onupgradeneeded = (event) => {
-//       // @ts-ignore
-//       const db = event.target?.result;
-//       db.createObjectStore("files", { keyPath: "id" });
-//     };
-//   });
-// }

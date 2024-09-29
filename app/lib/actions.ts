@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Expense, ExpensePostBody } from "./types";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
+import { Expense, ExpensePostBody, LLMExpenseObjectSchema } from "./types";
 
 export async function getExpenses(userId: string) {
   const result = await fetch(
@@ -119,4 +121,19 @@ export async function deleteExpense({
   }
 
   return;
+}
+
+export async function generateExpense(expenseString: string) {
+  const { object } = await generateObject({
+    model: openai("gpt-4o-mini"),
+    schema: LLMExpenseObjectSchema,
+    prompt: `You are given the description of an expense in raw text form. 
+      You have to convert it into the given expense schema object. 
+      The date today is ${new Date().toDateString()}. Use this date as a reference for when the raw text
+      contains terms like 'yesterday' and so on to figure out the correct date.
+      If there is no indication of a date, the date is today.
+      This is the raw text: ${expenseString}`,
+  });
+
+  return object;
 }
