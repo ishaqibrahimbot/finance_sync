@@ -9,27 +9,27 @@ import {
 } from "@/components/ui/card";
 import { CalendarIcon, DollarSignIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { deleteExpense, updateExpense } from "@/app/lib/actions";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-import { cn, safeExecuteAction } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { cn } from "@/lib/utils";
 
 interface ExpenseModalProps {
   expense: Expense;
   onClose: () => void;
 }
 
-export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
+export default function ExpenseModalDemo({
+  expense,
+  onClose,
+}: ExpenseModalProps) {
   const [editing, setEditing] = useState(false);
   const [editPrompt, setEditPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userId } = useAuth();
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
       <Card className="max-w-md w-full">
-        <CardHeader closeDisabled={editing} onClose={onClose}>
+        <CardHeader onClose={onClose}>
           <CardTitle className="text-2xl">{expense.title}</CardTitle>
           <p className="text-gray-600">{expense.category}</p>
         </CardHeader>
@@ -72,39 +72,12 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
         </CardContent>
         <CardFooter className="flex flex-col items-center w-full space-y-4">
           <div className="flex flex-row items-center space-x-4 w-full">
-            <Button
-              onClick={() => {
-                if (editing) {
-                  setEditing(false);
-                } else {
-                  setEditing(true);
-                }
-              }}
-              className="w-full"
-              disabled={loading}
-              variant={"outline"}
-            >
+            <Button className="w-full" disabled={loading} variant={"outline"}>
               {editing ? `Cancel Edit` : `Edit`}
             </Button>
             <Button
               loading={loading}
               disabled={editing}
-              onClick={async () => {
-                setLoading(true);
-                await safeExecuteAction({
-                  id: "deleteExpense",
-                  action: async () => {
-                    await deleteExpense({
-                      expenseId: expense.expenseId,
-                      userId: userId!,
-                    });
-                  },
-                  onSuccess: () => {
-                    onClose();
-                  },
-                });
-                setLoading(false);
-              }}
               variant={"outline"}
               className="w-full"
             >
@@ -119,30 +92,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 placeholder="Describe your changes..."
                 className="w-full min-h-[80px] resize-none rounded-md"
               />
-              <Button
-                loading={loading}
-                onClick={async () => {
-                  setLoading(true);
-                  await safeExecuteAction({
-                    id: "updateExpense",
-                    action: async () => {
-                      await updateExpense({
-                        expenseId: expense.expenseId,
-                        prompt: editPrompt,
-                        userId: userId!,
-                      });
-                    },
-                    onSuccess: () => {
-                      setEditing(false);
-                      setEditPrompt("");
-                      onClose();
-                    },
-                  });
-                  setLoading(false);
-                }}
-                variant={"default"}
-                className="w-full"
-              >
+              <Button loading={loading} variant={"default"} className="w-full">
                 Save
               </Button>
             </>

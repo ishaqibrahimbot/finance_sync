@@ -19,7 +19,7 @@ export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
   const { userId } = useAuth();
 
   const revalidateExpenses = async () => {
-    await revalidate("/");
+    await revalidate("/dashboard");
   };
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
 
   return (
     <Card
-      className="cursor-pointer hover:bg-accent transition-colors"
+      className="cursor-pointer hover:bg-primary/10 transition-colors"
       onClick={onClick}
     >
       <CardContent className="p-4 flex justify-between items-center">

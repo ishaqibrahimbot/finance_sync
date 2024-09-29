@@ -14,7 +14,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
 
   return (
     <div className="my-8">
-      <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
+      <div className="space-y-4 max-h-screen overflow-y-auto pr-2">
         {expenses.map((expense) => (
           <ExpenseItem
             key={expense.expenseId}
