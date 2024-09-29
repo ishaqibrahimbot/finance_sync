@@ -8,15 +8,18 @@ import { Section } from "@/components/ui/section";
 import { DndProvider } from "react-dnd";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export const maxDuration = 60;
 
 export default function Home() {
+  const { width } = useWindowSize();
   return (
     <>
       <ServiceWorkerRegistration />
       <Header />
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={width && width < 640 ? TouchBackend : HTML5Backend}>
         <ImageProcessing />
         <TextProcessing />
         <Section>
