@@ -29,7 +29,7 @@ export function Menu() {
               className={`text-lg ${
                 pathname === item.href
                   ? "text-primary font-semibold"
-                  : "text-muted-foreground"
+                  : "text-black"
               }`}
             >
               {item.label}

@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Image from "next/image";
-import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 export const maxDuration = 60;
 
@@ -21,14 +19,7 @@ export default async function Home() {
 
   if (!userId) {
     return (
-      <div className="flex flex-col items-center justify-start min-h-screen bg-slate-100">
-        <Image
-          className="-mt-8"
-          width={280}
-          height={280}
-          alt="finance sync logo"
-          src="/landing-page-image.png"
-        />
+      <div className="flex flex-col items-center justify-start pt-40 min-h-screen bg-background">
         <Card className="w-[350px]">
           <CardHeader className="space-y-2">
             <CardTitle>Welcome to Yet Another Finance App</CardTitle>
@@ -51,7 +42,6 @@ export default async function Home() {
 
   return (
     <>
-      <ServiceWorkerRegistration />
       <div className="container mx-auto p-4 pb-32">
         <ExpenseList expenses={expenses} />
         <ExpenseInput />

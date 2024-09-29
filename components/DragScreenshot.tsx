@@ -1,8 +1,17 @@
 "use client";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { useDrag } from "react-dnd";
 
-export function DragScreenshot({ imageHidden }: { imageHidden: boolean }) {
+export function DragScreenshot({
+  imageHidden,
+  src,
+  width,
+}: {
+  imageHidden: boolean;
+  src: string;
+  width: number;
+}) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "image",
     collect: (monitor) => ({
@@ -12,11 +21,15 @@ export function DragScreenshot({ imageHidden }: { imageHidden: boolean }) {
 
   return (
     <div
+      //@ts-ignore
       ref={drag}
       className={cn(
-        "w-20 h-20 self-start bg-gray-700 rounded-sm transition-transform duration-300 shadow-sm",
-        imageHidden && "scale-0"
+        "self-start cursor-grab transition-transform duration-300 shadow-sm",
+        imageHidden && "scale-0",
+        isDragging && "cursor-grabbing"
       )}
-    ></div>
+    >
+      <Image src={src} width={width} height={300} alt="receipt" />
+    </div>
   );
 }

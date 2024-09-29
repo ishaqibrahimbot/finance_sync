@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { XIcon, XSquareIcon } from "lucide-react";
+import { Button } from "./button";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -9,7 +11,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "rounded-lg border border-primary/20 bg-card text-card-foreground shadow-sm",
       className
     )}
     {...props}
@@ -19,13 +21,28 @@ Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & {
+    onClose?: () => void;
+    closeDisabled?: boolean;
+  }
+>(({ className, children, onClose, closeDisabled = false, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex relative flex-col space-y-1.5 p-6", className)}
     {...props}
-  />
+  >
+    {children}
+    <div className="absolute top-4 right-4">
+      <Button
+        disabled={closeDisabled}
+        onClick={onClose}
+        size={"icon"}
+        variant={"ghost"}
+      >
+        <XIcon />
+      </Button>
+    </div>
+  </div>
 ));
 CardHeader.displayName = "CardHeader";
 

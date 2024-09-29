@@ -1,12 +1,15 @@
 "use client";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { useState } from "react";
 import { useDrop } from "react-dnd";
 
 export function DragTarget({
   hideImage,
+  showResult,
 }: {
   hideImage: (...args: any) => any;
+  showResult: boolean;
 }) {
   const [dropped, setDropped] = useState(false);
   const [{ isOver }, drop] = useDrop(() => ({
@@ -22,17 +25,15 @@ export function DragTarget({
 
   return (
     <div
+      // @ts-ignore
       ref={drop}
       className={cn(
-        "bg-[#7c6015] p-6 transition-transform duration-300 flex space-y-2 flex-col items-center justify-center",
-        isOver && "scale-125",
-        dropped && "animate-bounce duration-700"
+        "p-6 transition-transform duration-300 flex space-y-2 flex-col items-center justify-center",
+        isOver && "scale-[2]",
+        dropped && !showResult && "animate-pulse duration-700"
       )}
     >
-      <p className={cn("font-mono text-2xl")}>YAFA</p>
-      {dropped && (
-        <div className="w-20 h-20 bg-gray-700 rounded-sm shadow-sm"></div>
-      )}
+      <Image src="/yafa-logo.png" width={100} height={100} alt="yafa logo" />
     </div>
   );
 }
