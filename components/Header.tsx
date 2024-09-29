@@ -22,7 +22,7 @@ export const Header = () => {
     };
   }, []);
   return (
-    <header className="p-4">
+    <header className="p-4 pb-0 sm:pb-4">
       <nav className="flex sm:flex-row space-y-2 sm:space-y-0 flex-col justify-between items-center">
         <Image
           src="/yafa-text-logo.png"
@@ -30,7 +30,7 @@ export const Header = () => {
           width={320}
           height={100}
         />
-        <ul className="flex flex-row items-center text-gray-600">
+        <ul className="flex flex-row -space-x-2 items-center text-gray-600">
           <li>
             <Button
               // @ts-ignore
@@ -42,9 +42,9 @@ export const Header = () => {
           </li>
           {userId ? (
             <>
-              <Link href="/dashboard">
-                <Button variant={"link"}>Dashboard</Button>
-              </Link>
+              <Button asChild variant={"link"}>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
               <Button variant={"link"} className="" asChild>
                 <SignOutButton>Sign Out</SignOutButton>
               </Button>
@@ -52,17 +52,29 @@ export const Header = () => {
           ) : (
             <>
               <li>
-                <Link href="/sign-in">
-                  <Button variant={"link"}>Sign In</Button>
-                </Link>
+                <Button asChild variant={"link"}>
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
               </li>
               <li>
-                <Link href={"/sign-up"}>
-                  <Button variant={"link"}>Sign Up</Button>
-                </Link>
+                <Button asChild variant={"link"}>
+                  <Link href={"/sign-up"}>Sign Up</Link>
+                </Button>
               </li>
             </>
           )}
+          <li>
+            <Button asChild variant={"link"}>
+              <a
+                href={
+                  "https://www.ishaqibrahim.com/posts/introducing-yet-another-finance-app"
+                }
+                target="_blank"
+              >
+                About YAFA
+              </a>
+            </Button>
+          </li>
         </ul>
       </nav>
     </header>

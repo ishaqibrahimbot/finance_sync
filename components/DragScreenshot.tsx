@@ -12,10 +12,11 @@ export function DragScreenshot({
   src: string;
   width: number;
 }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging, difference }, drag] = useDrag(() => ({
     type: "image",
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
+      difference: monitor.getDifferenceFromInitialOffset(),
     }),
   }));
 
@@ -23,8 +24,18 @@ export function DragScreenshot({
     <div
       //@ts-ignore
       ref={drag}
+      style={{
+        ...(isDragging && !!difference
+          ? {
+              position: "relative",
+              zIndex: 999,
+              transform: `translate(${difference.x}px, ${difference.y}px)`,
+              pointerEvents: "none",
+            }
+          : {}),
+      }}
       className={cn(
-        "self-start cursor-grab transition-transform duration-300 shadow-sm",
+        "self-start cursor-grab transition-transform shadow-sm",
         imageHidden && "scale-0",
         isDragging && "cursor-grabbing"
       )}

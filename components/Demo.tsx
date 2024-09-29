@@ -36,7 +36,7 @@ export const Demo = () => {
           onClose={() => setSelectedExpense(null)}
         />
       )}
-      <div className="px-4 pb-4 space-x-2 absolute bottom-0 left-0 right-0 flex flex-row items-center justify-between">
+      <div className="px-4 pb-4 space-x-2 absolute bottom-0 left-0 right-0 flex flex-col space-y-2 sm:space-y-0 sm:flex-row items-center justify-between">
         <Input value={value} onChange={(e) => setValue(e.target.value)} />
         <Button
           disabled={!value}

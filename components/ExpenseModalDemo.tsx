@@ -11,7 +11,6 @@ import { CalendarIcon, DollarSignIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-import { cn } from "@/lib/utils";
 
 interface ExpenseModalProps {
   expense: Expense;
@@ -70,34 +69,6 @@ export default function ExpenseModalDemo({
             })}
           </ul>
         </CardContent>
-        <CardFooter className="flex flex-col items-center w-full space-y-4">
-          <div className="flex flex-row items-center space-x-4 w-full">
-            <Button className="w-full" disabled={loading} variant={"outline"}>
-              {editing ? `Cancel Edit` : `Edit`}
-            </Button>
-            <Button
-              loading={loading}
-              disabled={editing}
-              variant={"outline"}
-              className="w-full"
-            >
-              Delete
-            </Button>
-          </div>
-          {editing && (
-            <>
-              <Textarea
-                value={editPrompt}
-                onChange={(e) => setEditPrompt(e.target.value)}
-                placeholder="Describe your changes..."
-                className="w-full min-h-[80px] resize-none rounded-md"
-              />
-              <Button loading={loading} variant={"default"} className="w-full">
-                Save
-              </Button>
-            </>
-          )}
-        </CardFooter>
       </Card>
     </div>
   );
