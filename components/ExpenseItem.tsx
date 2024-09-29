@@ -19,7 +19,7 @@ export default function ExpenseItem({ expense, onClick }: ExpenseItemProps) {
   const { userId } = useAuth();
 
   const revalidateExpenses = async () => {
-    await revalidate("/");
+    await revalidate("/dashboard");
   };
 
   useEffect(() => {

@@ -111,7 +111,10 @@ export default function ExpenseInput() {
                     <Trash2Icon className="h-5 w-5" />
                   </Button>
                   <div className="text-sm text-muted-foreground max-w-36">
-                    Image attached: {image.name}
+                    Image attached:{" "}
+                    {image.name.length > 20
+                      ? image.name.slice(0, 20)
+                      : image.name}
                   </div>
                 </div>
               ) : (

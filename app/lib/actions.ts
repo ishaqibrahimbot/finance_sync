@@ -70,7 +70,7 @@ export async function addExpense({
   }
 
   const newlyAddedExpense = await result.json();
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return newlyAddedExpense as Expense;
 }
 
@@ -94,7 +94,7 @@ export async function updateExpense({
   );
 
   if (result.ok) {
-    revalidatePath("/");
+    revalidatePath("/dashboard");
   }
 
   return;
@@ -115,7 +115,7 @@ export async function deleteExpense({
   );
 
   if (result.ok) {
-    revalidatePath("/");
+    revalidatePath("/dashboard");
   }
 
   return;
