@@ -52,7 +52,7 @@ export const ImageProcessing = () => {
         <span>?</span>
       </h2>
       <h3 className="text-center text-[#7c6015]">
-        Drag the {imageType} to the app
+        Drag the {imageType} to the app (refresh the page to try again)
       </h3>
       <div className="py-4 mx-auto flex w-full max-w-3xl flex-col sm:flex-row justify-start space-y-6 sm:space-y-0 sm:justify-between items-center">
         <div>
