@@ -3,22 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
-import { Expense, ExpensePostBody, LLMExpenseObjectSchema } from "./types";
+import { LLMExpenseObjectSchema } from "./types";
+import { createClient } from "@/lib/supabase/server";
 
-export async function getExpenses(userId: string) {
-  const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}`
-  );
-  const expenses: Expense[] = await result.json();
-  expenses.sort((a, b) => {
-    if (a.date > b.date) return -1;
-    else if (a.date < b.date) return 1;
-    else {
-      if (a.createdAt > b.createdAt) return -1;
-      else return 1;
-    }
-  });
-  return expenses;
+export async function getExpenses() {
+  const supabase = await createClient();
+
+  const allTransactions = await supabase
+    .from("transactions")
+    .select("*")
+    .order("date", {
+      ascending: false,
+    })
+    .limit(5);
+
+  return allTransactions;
 }
 
 export async function revalidate(path: string) {
@@ -40,40 +39,39 @@ export async function addExpense({
 
   if (!rawText && !image) return;
 
-  const payload: ExpensePostBody = {
-    userId,
-    text: rawText,
-  };
+  const supabase = await createClient();
+
+  let imageUrl: string | undefined;
 
   if (image) {
-    let arrayBuffer: ArrayBuffer = await image.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString("base64");
+    const imagePath = `${userId}/${crypto.randomUUID()}`;
 
-    payload.image = {
-      filename: image.name,
-      contentType: image.type,
-      base64Data,
-    };
+    const { error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(imagePath, image);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = await supabase.storage
+      .from("images")
+      .createSignedUrl(imagePath, 3600);
+
+    imageUrl = data?.signedUrl;
   }
 
-  //   console.log("payload", payload);
-
-  const result = await fetch(`${process.env.API_GATEWAY_ROOT_URL}/expenses`, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-    },
+  const { data, error } = await supabase.from("transactions").insert({
+    sourcetext: rawText,
+    processingstatus: "processing",
+    attachment: imageUrl,
+    userid: userId,
   });
 
-  if (!result.ok) {
-    console.log("oops something went wrong");
+  if (error) {
+    console.log("failed to insert record", error);
     return;
   }
 
-  const newlyAddedExpense = await result.json();
-  revalidatePath("/dashboard");
-  return newlyAddedExpense as Expense;
+  return;
 }
 
 export async function updateExpense({
@@ -102,25 +100,11 @@ export async function updateExpense({
   return;
 }
 
-export async function deleteExpense({
-  expenseId,
-  userId,
-}: {
-  expenseId: string;
-  userId: string;
-}) {
-  const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}/${expenseId}`,
-    {
-      method: "DELETE",
-    }
-  );
+export async function deleteExpense({ expenseId }: { expenseId: number }) {
+  const supabase = await createClient();
 
-  if (result.ok) {
-    revalidatePath("/dashboard");
-  }
-
-  return;
+  await supabase.from("transactions").delete().eq("id", expenseId);
+  revalidatePath("/dashboard");
 }
 
 export async function generateExpense(expenseString: string) {

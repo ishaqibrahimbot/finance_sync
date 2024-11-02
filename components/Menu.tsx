@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon } from "lucide-react";
-import { SignOutButton } from "@clerk/nextjs";
+import { signout } from "@/app/sign-in/[[...sign-in]]/actions";
 
 const menuItems = [{ href: "/", label: "Home" }];
 
@@ -35,9 +35,7 @@ export function Menu() {
               {item.label}
             </Link>
           ))}
-          <Button className="" asChild>
-            <SignOutButton>Sign Out</SignOutButton>
-          </Button>
+          <Button onClick={() => signout()}>Sign Out</Button>
         </nav>
       </SheetContent>
     </Sheet>

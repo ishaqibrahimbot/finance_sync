@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { SignOutButton, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { signout } from "@/app/sign-in/[[...sign-in]]/actions";
 
 export const Header = () => {
-  const { userId } = useAuth();
   const event = useRef<Event>();
+
+  const { user } = useAuth();
 
   const saveEvent = (e: Event) => {
     e.preventDefault();
@@ -40,13 +43,13 @@ export const Header = () => {
               Install
             </Button>
           </li>
-          {userId ? (
+          {user ? (
             <>
               <Button asChild variant={"link"}>
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
-              <Button variant={"link"} className="" asChild>
-                <SignOutButton>Sign Out</SignOutButton>
+              <Button variant={"link"} onClick={() => signout()}>
+                Sign Out
               </Button>
             </>
           ) : (

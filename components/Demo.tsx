@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -6,7 +7,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Expense } from "../app/lib/types";
 import { generateExpense } from "@/app/lib/actions";
-import ExpenseItem from "./ExpenseItem";
+import ExpenseItem from "./ExpenseContainer";
 import ExpenseModalDemo from "./ExpenseModalDemo";
 
 export const Demo = () => {

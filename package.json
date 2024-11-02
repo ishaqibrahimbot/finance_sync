@@ -9,15 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.63",
-    "@clerk/nextjs": "^5.4.1",
+    "@ai-sdk/openai": "^0.0.70",
+    "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-scroll-area": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.6",
     "@uidotdev/usehooks": "^2.4.1",
-    "ai": "^3.4.7",
+    "ai": "^3.4.27",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "compressorjs": "^1.2.1",
@@ -29,11 +33,12 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dnd-touch-backend": "^16.0.1",
     "react-dom": "^18",
+    "react-hook-form": "^7.53.1",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
-    "zod": "^3.23.8"
+    "zod": "link:@hookform/resolvers/zod"
   },
   "devDependencies": {
     "@types/node": "^20",

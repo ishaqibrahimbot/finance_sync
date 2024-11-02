@@ -4,14 +4,13 @@ import { useState, useRef } from "react";
 import { ImageIcon, SendIcon, CameraIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import { addExpense } from "@/app/lib/actions";
-import { useAuth } from "@clerk/nextjs";
 import { safeExecuteAction } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Compressor from "compressorjs";
 import PreviewImage from "./PreviewImage";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ExpenseInput() {
   const [input, setInput] = useState("");
@@ -20,7 +19,7 @@ export default function ExpenseInput() {
   const imageCaptureInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const queryParams = useSearchParams();
   const router = useRouter();
 
@@ -176,7 +175,8 @@ export default function ExpenseInput() {
                 await safeExecuteAction({
                   id: "addExpense",
                   action: async () => {
-                    await addExpense({ formData, userId: userId! });
+                    if (!user?.id) return toast.error("no user id");
+                    await addExpense({ formData, userId: user.id });
                   },
                   onSuccess: () => {
                     setInput("");

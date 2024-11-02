@@ -27,7 +27,7 @@ export default function Home() {
           <TextProcessing />
         </DndProvider>
       )}
-      <Section>
+      {/* <Section>
         <h2 className="text-[#7c6015] text-center mb-1">
           {`Here's a mini demo :)`}
         </h2>
@@ -36,7 +36,7 @@ export default function Home() {
         </p>
         <p className="text-[#7c6015] text-center text-sm">{`2. Tap on the generated card`}</p>
         <Demo />
-      </Section>
+      </Section> */}
       <Section>
         <h2 className="text-[#7c6015] text-center">{`Visit this blog post to learn more (and watch some real videos):`}</h2>
         <Button className="w-fit mx-auto" asChild variant="default">
