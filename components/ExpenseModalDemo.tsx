@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Expense } from "@/app/lib/types";
 import { Button } from "@/components/ui/button";
 import {

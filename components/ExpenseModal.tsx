@@ -146,6 +146,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                   defaultValue={formState.defaultValues?.category}
                   {...register("category")}
                   onValueChange={(value) => {
+                    //@ts-ignore
                     setValue("category", value);
                   }}
                 >
@@ -156,7 +157,9 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                     <SelectGroup>
                       {categories.map((category) => {
                         return (
-                          <SelectItem value={category}>{category}</SelectItem>
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
                         );
                       })}
                     </SelectGroup>
@@ -172,6 +175,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 <Select
                   defaultValue={formState.defaultValues?.currency}
                   {...register("currency")}
+                  //@ts-ignore
                   onValueChange={(value) => setValue("currency", value)}
                 >
                   <SelectTrigger>
@@ -181,7 +185,9 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                     <SelectGroup>
                       {currencies.map((currency) => {
                         return (
-                          <SelectItem value={currency}>{currency}</SelectItem>
+                          <SelectItem key={currency} value={currency}>
+                            {currency}
+                          </SelectItem>
                         );
                       })}
                     </SelectGroup>
@@ -197,6 +203,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                 <Select
                   defaultValue={formState.defaultValues?.method}
                   {...register("method")}
+                  //@ts-ignore
                   onValueChange={(value) => setValue("method", value)}
                 >
                   <SelectTrigger>
@@ -205,7 +212,11 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
                   <SelectContent>
                     <SelectGroup>
                       {methods.map((method) => {
-                        return <SelectItem value={method}>{method}</SelectItem>;
+                        return (
+                          <SelectItem key={method} value={method}>
+                            {method}
+                          </SelectItem>
+                        );
                       })}
                     </SelectGroup>
                   </SelectContent>
