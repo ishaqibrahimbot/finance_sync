@@ -74,32 +74,6 @@ export async function addExpense({
   return;
 }
 
-export async function updateExpense({
-  expenseId,
-  prompt,
-  userId,
-}: {
-  expenseId: string;
-  prompt: string;
-  userId: string;
-}) {
-  const result = await fetch(
-    `${process.env.API_GATEWAY_ROOT_URL}/expenses/${userId}/${expenseId}`,
-    {
-      method: "PUT",
-      body: JSON.stringify({
-        prompt,
-      }),
-    }
-  );
-
-  if (result.ok) {
-    revalidatePath("/dashboard");
-  }
-
-  return;
-}
-
 export async function deleteExpense({ expenseId }: { expenseId: number }) {
   const supabase = await createClient();
 
