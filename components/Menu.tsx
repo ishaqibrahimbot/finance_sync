@@ -7,7 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon } from "lucide-react";
 import { signout } from "@/app/sign-in/[[...sign-in]]/actions";
 
-const menuItems = [{ href: "/", label: "Home" }];
+const menuItems = [
+  { href: "/", label: "Home" },
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+  },
+  {
+    label: "Analytics",
+    href: "/dashboard/analytics",
+  },
+];
 
 export function Menu() {
   const pathname = usePathname();

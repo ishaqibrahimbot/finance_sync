@@ -7,6 +7,9 @@ import ExpenseModal from "./ExpenseModal";
 import { useInsertExpense } from "@/hooks/useInsertExpense";
 import { useUpdateExpense } from "@/hooks/useUpdateExpense";
 import { useDeleteExpense } from "@/hooks/useDeleteExpense";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { ChartColumnIcon } from "lucide-react";
 
 interface ExpenseListProps {
   serverExpenses: ExpenseType[];
@@ -17,6 +20,7 @@ export default function ExpenseList({ serverExpenses }: ExpenseListProps) {
   const [selectedExpense, setSelectedExpense] = useState<ExpenseType | null>(
     null
   );
+  const path = usePathname();
 
   useDeleteExpense((payload) => {
     console.log("deleted", payload);
@@ -75,6 +79,12 @@ export default function ExpenseList({ serverExpenses }: ExpenseListProps) {
         )}
       </div>
       <ExpenseInput />
+      <Link
+        href="/dashboard/analytics"
+        className="fixed bg-primary right-6 rounded-full p-2 bottom-48"
+      >
+        <ChartColumnIcon className="w-8 h-8 text-white" />
+      </Link>
     </div>
   );
 }

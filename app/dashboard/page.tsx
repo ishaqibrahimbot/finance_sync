@@ -1,20 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import ExpenseList from "@/components/ExpenseList";
 
 export const maxDuration = 60;
 
 export default async function Home() {
   const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data?.user) {
-    console.log("ERRRO: ", error);
-    redirect("/sign-in");
-  }
-
-  console.log("user", data.user.email);
 
   const expenses = await supabase
     .from("transactions")
