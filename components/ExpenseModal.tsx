@@ -34,28 +34,20 @@ import {
 } from "./ui/select";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
+import { useImageUrl } from "@/hooks/useImageUrl";
 
 interface ExpenseModalProps {
   expense: Expense;
   onClose: () => void;
 }
 
-function getMetadata(signedUrl: string) {
-  const urlObject = new URL(signedUrl);
-  const expiryParam = urlObject.searchParams.get("token");
-  if (!expiryParam) return null;
-
-  // Extract expiry timestamp from JWT token (simplified)
-  const token = expiryParam.split(".")[1];
-  const payload = JSON.parse(atob(token));
-  return payload;
-}
-
 export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
   const [editing, setEditing] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    expense.attachment ?? null
-  );
+  const imageUrl = useImageUrl({
+    currentUrl: expense.attachment,
+    expenseId: expense.id,
+  });
+
   const [loading, setLoading] = useState(false);
 
   // @ts-ignore
@@ -76,38 +68,6 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
       },
       resolver: zodResolver(LLMExpenseObjectSchema),
     });
-
-  useEffect(() => {
-    if (!imageUrl) return;
-
-    const imageMetadata = getMetadata(imageUrl);
-
-    if (!imageMetadata) return;
-
-    const expiryTime = imageMetadata.exp * 1000;
-    const needsRenewal = Date.now() + 5 * 60 * 1000 > expiryTime;
-
-    if (!needsRenewal) return;
-    supabase.storage
-      .from("images")
-      .createSignedUrl(imageMetadata.url.replace("images/", ""), 3600)
-      .then(({ data }) => {
-        if (data?.signedUrl) {
-          supabase
-            .from("transactions")
-            .update({
-              attachment: data?.signedUrl,
-            })
-            .eq("id", expense.id)
-            .then(({ error }) => {
-              if (!error) {
-                setImageUrl(data.signedUrl);
-              }
-            });
-        }
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expense.id]);
 
   if (editing) {
     return (

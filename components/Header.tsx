@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { signout } from "@/app/sign-in/[[...sign-in]]/actions";
 

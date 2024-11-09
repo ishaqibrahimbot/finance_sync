@@ -1,6 +1,7 @@
 import { type Expense } from "@/app/lib/types";
 import { Card, CardContent } from "./ui/card";
-import { CalendarIcon, LoaderCircleIcon } from "lucide-react";
+import { CalendarIcon, CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
+import { useImageUrl } from "@/hooks/useImageUrl";
 
 export default function Expense({
   expense,
@@ -35,25 +36,38 @@ export default function Expense({
 }
 
 function ExpenseProcessing({ expense }: { expense: Expense }) {
+  const imageUrl = useImageUrl({
+    currentUrl: expense.attachment,
+    expenseId: expense.id,
+  });
   return (
     <Card className="bg-primary/5">
       <CardContent className="p-4 space-y-2">
         <div className="flex flex-row items-center space-x-2">
-          <LoaderCircleIcon className="h-5 w-5 animate-spin" />
-          <p className="text-sm text-muted-foreground">{`Processing...`}</p>
+          {expense.processingstatus === "failed" ? (
+            <>
+              <CircleAlertIcon className="h-5 w-5 text-red-800" />
+              <p className="text-sm text-muted-foreground">{`Failed`}</p>
+            </>
+          ) : (
+            <>
+              <LoaderCircleIcon className="h-5 w-5 animate-spin" />
+              <p className="text-sm text-muted-foreground">{`Processing...`}</p>
+            </>
+          )}
         </div>
 
         {expense.sourcetext && (
           <p className="text-sm line-clamp-1">{`Text: ${expense.sourcetext}`}</p>
         )}
         <div className="flex flex-row space-x-4 items-center">
-          {expense.attachment && (
+          {imageUrl && (
             <p className="text-sm">
               <a
                 target="_blank"
                 rel="noreferrer noopener"
                 className="text-sm underline text-gray-800"
-                href={expense.attachment}
+                href={imageUrl}
               >
                 View attachment
               </a>
