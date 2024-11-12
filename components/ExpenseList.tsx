@@ -81,7 +81,7 @@ export default function ExpenseList({ serverExpenses }: ExpenseListProps) {
       <ExpenseInput />
       <Link
         href="/dashboard/analytics"
-        className="fixed bg-primary right-6 rounded-full p-2 bottom-48"
+        className="fixed bg-primary right-6 rounded-full p-2 bottom-48 transition-all duration-500 active:scale-125"
       >
         <ChartColumnIcon className="w-8 h-8 text-white" />
       </Link>

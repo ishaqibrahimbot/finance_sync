@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -15,14 +15,20 @@ import {
   QueryClient,
   QueryClientProvider,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { supabase } from "@/lib/supabase";
 import Expense from "../Expense";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { categories } from "@/app/lib/types";
+import { type Expense as ExpenseType } from "@/app/lib/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { useLockBodyScroll } from "@uidotdev/usehooks";
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
+import ExpenseModal from "../ExpenseModal";
+import { useUpdateExpense } from "@/hooks/useUpdateExpense";
 
 const rangePreSelects = [
   "today",
@@ -81,6 +87,9 @@ function Analytics() {
   const [view, setView] = useState<View>("all");
   const [query, setQuery] = useState<string>("");
   const [selectedGroup, setSelectedGroup] = useState();
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseType | null>(
+    null
+  );
 
   const { data } = useQuery({
     queryKey:
@@ -176,6 +185,7 @@ function Analytics() {
       } else {
         const start = new Date(customRangeStart!);
         const end = new Date(customRangeEnd!);
+        end.setTime(end.getTime() + ONE_DAY);
 
         return await supabase
           .from("transactions")
@@ -208,6 +218,32 @@ function Analytics() {
         return [...prev, newObj];
       }, new Array()),
     [data?.count, data?.data]
+  );
+
+  const queryClient = useQueryClient();
+
+  useUpdateExpense(
+    (payload) => {
+      let queryKey = ["analytics"];
+      if (selectedRange === "custom" && customRangeStart && customRangeEnd) {
+        queryKey = queryKey.concat([
+          "custom",
+          customRangeStart,
+          customRangeEnd,
+        ]);
+      } else {
+        queryKey.push(selectedRange);
+      }
+      queryClient
+        .invalidateQueries({
+          queryKey,
+        })
+        .then(() => {
+          setSelectedExpense(null);
+          setSelectedGroup(undefined);
+        });
+    },
+    [selectedRange, customRangeEnd, customRangeStart]
   );
 
   return (
@@ -280,7 +316,10 @@ function Analytics() {
           {view === "all" &&
             data?.data?.map((expense) => (
               <li key={expense.id}>
-                <Expense expense={expense} />
+                <Expense
+                  onClick={() => setSelectedExpense(expense)}
+                  expense={expense}
+                />
               </li>
             ))}
           {view === "category" &&
@@ -308,6 +347,20 @@ function Analytics() {
         <CategoryExpensesModal
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
+          setSelectedExpense={setSelectedExpense}
+        />
+      )}
+      <Link
+        href="/dashboard"
+        className="fixed bg-primary right-6 rounded-full p-2 bottom-10 transition-all duration-500 active:scale-125"
+      >
+        <ArrowLeftIcon className="w-8 h-8 text-white" />
+      </Link>
+      {selectedExpense && (
+        <ExpenseModal
+          key={selectedExpense.updatedat}
+          expense={selectedExpense}
+          onClose={() => setSelectedExpense(null)}
         />
       )}
     </>
@@ -328,9 +381,11 @@ export function AnalyticsView() {
 function CategoryExpensesModal({
   selectedGroup,
   setSelectedGroup,
+  setSelectedExpense,
 }: {
   selectedGroup: any;
   setSelectedGroup: any;
+  setSelectedExpense: Dispatch<SetStateAction<ExpenseType | null>>;
 }) {
   useLockBodyScroll();
 
@@ -344,7 +399,10 @@ function CategoryExpensesModal({
           <ul className="space-y-2 max-h-[calc(100vh-120px)] overflow-auto">
             {selectedGroup.expenses.map((expense: any) => (
               <li key={expense.id}>
-                <Expense expense={expense} />
+                <Expense
+                  onClick={() => setSelectedExpense(expense)}
+                  expense={expense}
+                />
               </li>
             ))}
           </ul>
