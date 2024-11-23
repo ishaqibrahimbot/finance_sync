@@ -44,7 +44,8 @@ export async function addExpense({
   let imageUrl: string | undefined;
 
   if (image) {
-    const imagePath = `${userId}/${crypto.randomUUID()}`;
+    const name = crypto.randomUUID();
+    const imagePath = `${userId}/${name}`;
 
     const { error: uploadError } = await supabase.storage
       .from("images")
@@ -52,11 +53,7 @@ export async function addExpense({
 
     if (uploadError) throw uploadError;
 
-    const { data } = await supabase.storage
-      .from("images")
-      .createSignedUrl(imagePath, 3600);
-
-    imageUrl = data?.signedUrl;
+    imageUrl = name;
   }
 
   const { data, error } = await supabase.from("transactions").insert({

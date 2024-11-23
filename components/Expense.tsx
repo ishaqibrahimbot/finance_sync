@@ -39,6 +39,7 @@ function ExpenseProcessing({ expense }: { expense: Expense }) {
   const imageUrl = useImageUrl({
     currentUrl: expense.attachment,
     expenseId: expense.id,
+    userId: expense.userid,
   });
   return (
     <Card className="bg-primary/5">

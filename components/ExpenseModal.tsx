@@ -46,6 +46,7 @@ export default function ExpenseModal({ expense, onClose }: ExpenseModalProps) {
   const imageUrl = useImageUrl({
     currentUrl: expense.attachment,
     expenseId: expense.id,
+    userId: expense.userid,
   });
 
   const [loading, setLoading] = useState(false);

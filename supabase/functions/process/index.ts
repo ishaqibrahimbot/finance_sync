@@ -36,6 +36,14 @@ const categories = [
   "Travel",
 ] as const;
 
+export const currencies = ["PKR", "USD", "EUR", "GBP", "AED"] as const;
+export const methods = [
+  "cash",
+  "credit-card",
+  "debit-card",
+  "bank-transfer",
+] as const;
+
 export const ExpenseSchema = z.object({
   userid: z.string(),
   id: z.string(),
@@ -46,13 +54,13 @@ export const ExpenseSchema = z.object({
       "the date on which the expense was made. This should be in the ISO yyyy-mm-dd format so that it can be used for sorting."
     ),
   amount: z.number(),
-  currency: z.enum(["PKR", "USD"]).default("PKR"),
+  currency: z.enum(currencies).default("PKR"),
   category: z.enum(categories),
   title: z
     .string()
     .optional()
     .describe("Should be a short and concise description of the expense"),
-  method: z.enum(["cash", "credit-card", "debit-card", "bank-transfer"]),
+  method: z.enum(methods),
   tags: z.array(z.string()),
   notes: z.string().optional().describe("add any context or extra notes here"),
   sourcetext: z.string(),
@@ -75,8 +83,6 @@ export const LLMExpenseObjectSchema = ExpenseSchema.pick({
 });
 
 type LLMExpenseObject = z.infer<typeof LLMExpenseObjectSchema>;
-
-console.log("Hello from Functions!");
 
 async function generateExpenseObject(expenseString: string) {
   const { object } = await ai.generateObject({
@@ -184,10 +190,21 @@ Deno.serve(async (req) => {
     if (!data.attachment) {
       llmExpenseObject = await generateExpenseObject(data.sourcetext);
     } else {
-      const imageResponse = await fetch(data.attachment);
-      const image = await imageResponse.blob();
+      // from now on attachment will be a key
+      // we gotta download the blob and convert it to base64
+      const key = data.attachment;
+      const userId = data.userid;
+      const imagePath = `${userId}/${key}`;
+      const { data: blob, error } = await supabase.storage
+        .from("images")
+        .download(imagePath);
 
-      const arrayBuffer = await image.arrayBuffer();
+      if (!blob || error) {
+        console.log(error);
+        throw new Error("failed to download image");
+      }
+
+      const arrayBuffer = await blob.arrayBuffer();
       const base64Data = base64.encodeBase64(arrayBuffer);
 
       llmExpenseObject = await processImage({
