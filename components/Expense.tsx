@@ -21,9 +21,7 @@ export default function Expense({
     >
       <CardContent className="p-4 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-semibold bg-black bg-opacity-90">
-            {expense.title}
-          </h3>
+          <h3 className="text-base font-semibold bg-black">{expense.title}</h3>
           <p className="text-sm mt-1 text-muted-foreground flex items-center">
             <CalendarIcon className="h-4 w-4 mr-1" />
             {expense.date?.split("T")[0]}
